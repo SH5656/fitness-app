@@ -1,18 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fitness App</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{font-family:Arial;background:#eef7ee;padding:10px}
-.app{max-width:480px;margin:auto;background:#fff;padding:12px;border-radius:12px}
-button,input{width:100%;padding:8px;margin:6px 0}
-.card{background:#f5f5f5;padding:10px;border-radius:10px;margin:10px 0}
-img{width:90px;height:90px;border-radius:50%}
+body{
+  font-family:Arial;
+  background:#e8f5e9;
+  padding:12px;
+}
+.app{
+  max-width:480px;
+  margin:auto;
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
+}
+button,input{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+.card{
+  background:#f5f5f5;
+  padding:10px;
+  border-radius:10px;
+  margin:10px 0;
+}
 </style>
 </head>
 
@@ -29,33 +47,23 @@ img{width:90px;height:90px;border-radius:50%}
 </div>
 
 <div class="card">
-<h3>👤 Login (Cloud)</h3>
-<input id="email" placeholder="Email">
-<input id="password" type="password">
-<button onclick="signup()">Sign Up</button>
-<button onclick="login()">Login</button>
-</div>
-
-<div class="card">
-<h3>📸 Profile Photo</h3>
-<img id="photo">
-<input type="file" id="photoInput">
-<button onclick="uploadPhoto()">Upload Photo</button>
+<h3>☑️ Today Habits</h3>
+<label><input type="checkbox" onclick="tick()"> Exercise</label><br>
+<label><input type="checkbox" onclick="tick()"> Running</label><br>
+<label><input type="checkbox" onclick="tick()"> Study</label>
 </div>
 
 </div>
 
-<audio id="tick">
-<source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
+<audio id="tickSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
-
-<script src="firebase.js" type="module"></script>
 
 <script>
 /* SOUND */
 let soundEnabled=false;
 function enableSound(){
-  const a=document.getElementById("tick");
+  const a=document.getElementById("tickSound");
   a.play().then(()=>{
     a.pause(); a.currentTime=0;
     soundEnabled=true;
@@ -63,19 +71,48 @@ function enableSound(){
   });
 }
 
-/* MONTHLY GRAPH */
-const labels=[1,2,3,4,5,6,7,8,9,10];
-const data=[40,60,30,80,70,90,50,60,75,85];
+function tick(){
+  if(soundEnabled){
+    tickSound.currentTime=0;
+    tickSound.play();
+  }
+  saveToday();
+}
 
-new Chart(document.getElementById("chart"),{
- type:"line",
- data:{labels:labels,datasets:[{
-   label:"Progress %",
-   data:data,
-   borderColor:"green"
- }]}
-});
+/* SAVE DATA */
+function saveToday(){
+  const key="day_"+new Date().getDate();
+  let c=parseInt(localStorage.getItem(key)||0);
+  localStorage.setItem(key,c+1);
+  loadChart();
+}
+
+/* CHART */
+let chart;
+function loadChart(){
+  const days=[...Array(30).keys()].map(i=>i+1);
+  const data=days.map(d=>{
+    return parseInt(localStorage.getItem("day_"+d)||0)*30;
+  });
+
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("chart"),{
+    type:"line",
+    data:{
+      labels:days,
+      datasets:[{
+        label:"Progress %",
+        data:data,
+        borderColor:"green",
+        tension:0.3
+      }]
+    }
+  });
+}
+
+loadChart();
 </script>
 
 </body>
 </html>
+
