@@ -9,86 +9,60 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Segoe UI, Arial, sans-serif;
-  background:#eef6ef;
-  padding:16px;
+  font-family:Arial, sans-serif;
+  background:#eef5ef;
+  padding:20px;
 }
 .app{
   max-width:520px;
   margin:auto;
   background:#fff;
-  border-radius:18px;
+  border-radius:16px;
   padding:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  box-shadow:0 8px 25px rgba(0,0,0,.15);
 }
-
-/* HEADER */
 .header{
   display:flex;
   align-items:center;
   gap:12px;
-  margin-bottom:14px;
 }
 .header img{
-  width:56px;
-  height:56px;
+  width:60px;
+  height:60px;
   border-radius:50%;
+  background:#ccc;
   object-fit:cover;
-  background:#ddd;
 }
 .header h2{
   margin:0;
-  font-size:20px;
 }
-
-/* INPUTS */
-input[type="text"]{
-  width:100%;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-top:6px;
-}
-input[type="file"]{
-  margin-top:6px;
-}
-
-/* BUTTON */
-button{
+input,button{
   width:100%;
   padding:10px;
-  margin:8px 0;
-  border:none;
-  border-radius:10px;
+  margin:6px 0;
+}
+button{
   background:#2ecc71;
+  border:none;
   color:#fff;
   font-size:16px;
+  border-radius:8px;
 }
-
-/* TABLE */
-.table-wrap{overflow-x:auto;margin-top:16px}
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:480px;
+  margin-top:16px;
 }
 th,td{
   border:1px solid #ccc;
   padding:8px;
   text-align:center;
-  font-size:14px;
 }
 th{
   background:#f2f2f2;
 }
-tr.today{
-  background:#fff6c1;
-}
-input[type="checkbox"]{
-  transform:scale(1.2);
-}
-input[type="checkbox"]:disabled{
-  opacity:0.3;
+.today{
+  background:#fff3c0;
 }
 </style>
 </head>
@@ -97,58 +71,53 @@ input[type="checkbox"]:disabled{
 
 <div class="app">
 
-<!-- HEADER -->
-<div class="header">
-  <img id="profilePic">
-  <div style="flex:1">
-    <h2 id="userNameText">My Fitness App</h2>
-    <input type="text" id="userNameInput" placeholder="Enter your name">
+  <!-- HEADER -->
+  <div class="header">
+    <img id="profilePic">
+    <h2 id="title">My Fitness App</h2>
   </div>
-</div>
 
-<input type="file" id="photoInput" accept="image/*">
-<button onclick="saveProfile()">Save Profile</button>
+  <input type="text" id="nameInput" placeholder="Enter your name">
+  <input type="file" id="photoInput" accept="image/*">
+  <button onclick="saveProfile()">Save Profile</button>
 
-<button onclick="enableSound()">🔊 Enable Sound</button>
+  <button onclick="enableSound()">🔊 Enable Sound</button>
 
-<!-- HABIT CHART -->
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-  <th>Date</th>
-  <th>Day</th>
-  <th>Exercise</th>
-  <th>Running</th>
-  <th>Study</th>
-</tr>
-</thead>
-<tbody id="chartBody"></tbody>
-</table>
-</div>
+  <!-- TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Day</th>
+        <th>Exercise</th>
+        <th>Running</th>
+        <th>Study</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 
 </div>
 
-<!-- SOUND -->
-<audio id="tickSound" preload="auto">
+<audio id="sound">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 
 <script>
-/* ===== PROFILE (NO RESET BUG) ===== */
-const nameInput = document.getElementById("userNameInput");
-const nameText = document.getElementById("userNameText");
+/* ---------- PROFILE ---------- */
+const nameInput = document.getElementById("nameInput");
+const title = document.getElementById("title");
 const profilePic = document.getElementById("profilePic");
 
 function saveProfile(){
   if(nameInput.value.trim()){
     localStorage.setItem("userName", nameInput.value.trim());
   }
-  const file = photoInput.files[0];
+  const file = document.getElementById("photoInput").files[0];
   if(file){
     const reader = new FileReader();
     reader.onload = ()=>{
-      localStorage.setItem("profilePic", reader.result);
+      localStorage.setItem("userPhoto", reader.result);
       profilePic.src = reader.result;
     };
     reader.readAsDataURL(file);
@@ -158,56 +127,57 @@ function saveProfile(){
 
 function loadProfile(){
   const n = localStorage.getItem("userName");
-  const p = localStorage.getItem("profilePic");
-  if(n) nameText.innerText = "👤 " + n;
+  const p = localStorage.getItem("userPhoto");
+  if(n) title.innerText = "👤 " + n;
   if(p) profilePic.src = p;
 }
 loadProfile();
 
-/* ===== SOUND ===== */
+/* ---------- SOUND ---------- */
 let soundEnabled=false;
-const sound=document.getElementById("tickSound");
+const sound=document.getElementById("sound");
 function enableSound(){
   sound.play().then(()=>{
-    sound.pause(); sound.currentTime=0;
+    sound.pause();
+    sound.currentTime=0;
     soundEnabled=true;
     alert("Sound enabled");
   });
 }
 
-/* ===== HABIT CHART ===== */
+/* ---------- TABLE ---------- */
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const today=new Date(); today.setHours(0,0,0,0);
+const today=new Date();
 
-function renderChart(){
-  const body=document.getElementById("chartBody");
-  body.innerHTML="";
-  const year=today.getFullYear();
-  const month=today.getMonth();
-  const totalDays=new Date(year,month+1,0).getDate();
+function renderTable(){
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+  const y=today.getFullYear();
+  const m=today.getMonth();
+  const total=new Date(y,m+1,0).getDate();
 
-  for(let d=1;d<=totalDays;d++){
-    const date=new Date(year,month,d);
+  for(let d=1; d<=total; d++){
+    const date=new Date(y,m,d);
     const isToday=date.toDateString()===today.toDateString();
-    const row=document.createElement("tr");
-    if(isToday) row.classList.add("today");
+    const tr=document.createElement("tr");
+    if(isToday) tr.classList.add("today");
 
-    row.innerHTML=`
+    tr.innerHTML=`
       <td>${d}</td>
       <td>${days[date.getDay()]}</td>
       ${[0,1,2].map(i=>{
-        const key=\`habit_${year}_${month}_${d}_${i}\`;
+        const key=\`habit_${y}_${m}_${d}_${i}\`;
         const checked=localStorage.getItem(key)==="1";
         return \`
-        <td>
-          <input type="checkbox"
-          ${checked?"checked":""}
-          ${!isToday?"disabled":""}
-          onchange="saveHabit('${key}',this)">
-        </td>\`;
+          <td>
+            <input type="checkbox"
+              ${checked?"checked":""}
+              ${!isToday?"disabled":""}
+              onchange="saveHabit('${key}',this)">
+          </td>\`;
       }).join("")}
     `;
-    body.appendChild(row);
+    tbody.appendChild(tr);
   }
 }
 
@@ -219,7 +189,7 @@ function saveHabit(key,el){
   }
 }
 
-renderChart();
+renderTable();
 </script>
 
 </body>
