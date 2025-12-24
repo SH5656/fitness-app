@@ -5,25 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fitness App</title>
 
+<!-- Chart library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
-  font-family:Arial;
+  font-family: Arial, sans-serif;
   background:#e8f5e9;
   padding:12px;
 }
 .app{
-  max-width:480px;
+  max-width:420px;
   margin:auto;
-  background:#fff;
+  background:#ffffff;
   padding:14px;
   border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.15);
 }
-button,input{
+h2,h3{
+  text-align:center;
+  margin:6px 0;
+}
+button{
   width:100%;
   padding:10px;
-  margin:6px 0;
+  margin:8px 0;
+  border:none;
+  border-radius:10px;
+  background:#2ecc71;
+  color:#fff;
+  font-size:16px;
 }
 .card{
   background:#f5f5f5;
@@ -31,81 +42,104 @@ button,input{
   border-radius:10px;
   margin:10px 0;
 }
+label{
+  display:block;
+  margin:6px 0;
+  font-size:15px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="app">
-<h2>🏋️ Fitness App</h2>
+  <h2>🏋️ My Fitness App</h2>
 
-<button onclick="enableSound()">🔊 Enable Sound</button>
+  <!-- Sound -->
+  <button onclick="enableSound()">🔊 Enable Sound</button>
 
-<div class="card">
-<h3>📊 Monthly Progress</h3>
-<canvas id="chart"></canvas>
+  <!-- Habits -->
+  <div class="card">
+    <h3>☑️ Today Habits</h3>
+    <label><input type="checkbox" onchange="tick()"> Exercise</label>
+    <label><input type="checkbox" onchange="tick()"> Running</label>
+    <label><input type="checkbox" onchange="tick()"> Study</label>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <h3>📊 Monthly Progress</h3>
+    <canvas id="chart"></canvas>
+  </div>
 </div>
 
-<div class="card">
-<h3>☑️ Today Habits</h3>
-<label><input type="checkbox" onclick="tick()"> Exercise</label><br>
-<label><input type="checkbox" onclick="tick()"> Running</label><br>
-<label><input type="checkbox" onclick="tick()"> Study</label>
-</div>
-
-</div>
-
-<audio id="tickSound">
+<!-- Tick sound -->
+<audio id="tickSound" preload="auto">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 
 <script>
-/* SOUND */
-let soundEnabled=false;
+/* ---------- SOUND ---------- */
+let soundEnabled = false;
+const sound = document.getElementById("tickSound");
+
 function enableSound(){
-  const a=document.getElementById("tickSound");
-  a.play().then(()=>{
-    a.pause(); a.currentTime=0;
-    soundEnabled=true;
-    alert("Sound enabled");
+  sound.play().then(()=>{
+    sound.pause();
+    sound.currentTime = 0;
+    soundEnabled = true;
+    alert("Sound enabled ✅");
+  }).catch(()=>{
+    alert("Tap again to enable sound");
   });
 }
 
+/* ---------- SAVE DAILY DATA ---------- */
 function tick(){
   if(soundEnabled){
-    tickSound.currentTime=0;
-    tickSound.play();
+    sound.currentTime = 0;
+    sound.play();
   }
-  saveToday();
-}
 
-/* SAVE DATA */
-function saveToday(){
-  const key="day_"+new Date().getDate();
-  let c=parseInt(localStorage.getItem(key)||0);
-  localStorage.setItem(key,c+1);
+  const today = new Date().getDate();
+  let count = parseInt(localStorage.getItem("day_"+today) || 0);
+  localStorage.setItem("day_"+today, count + 1);
   loadChart();
 }
 
-/* CHART */
+/* ---------- CHART ---------- */
 let chart;
+
 function loadChart(){
-  const days=[...Array(30).keys()].map(i=>i+1);
-  const data=days.map(d=>{
-    return parseInt(localStorage.getItem("day_"+d)||0)*30;
-  });
+  const daysInMonth = 30;   // simple fixed month
+  let labels = [];
+  let data = [];
+
+  for(let d=1; d<=daysInMonth; d++){
+    labels.push(d);
+    let value = parseInt(localStorage.getItem("day_"+d) || 0);
+    data.push(Math.min(value * 30, 100)); // convert to %
+  }
 
   if(chart) chart.destroy();
-  chart=new Chart(document.getElementById("chart"),{
+
+  chart = new Chart(document.getElementById("chart"),{
     type:"line",
     data:{
-      labels:days,
+      labels: labels,
       datasets:[{
         label:"Progress %",
-        data:data,
-        borderColor:"green",
-        tension:0.3
+        data: data,
+        borderColor:"#2ecc71",
+        backgroundColor:"rgba(46,204,113,0.2)",
+        tension:0.3,
+        fill:true
       }]
+    },
+    options:{
+      scales:{
+        y:{min:0,max:100}
+      }
     }
   });
 }
@@ -115,4 +149,3 @@ loadChart();
 
 </body>
 </html>
-
