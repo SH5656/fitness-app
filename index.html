@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Fitness App</title>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
 *{box-sizing:border-box}
 body{
@@ -16,18 +13,16 @@ body{
   background:#eef6ef;
   padding:16px;
 }
-
-/* App container */
 .app{
-  max-width:460px;
+  max-width:520px;
   margin:auto;
-  background:#ffffff;
+  background:#fff;
   border-radius:18px;
   padding:16px;
   box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* Header */
+/* HEADER */
 .header{
   display:flex;
   align-items:center;
@@ -35,8 +30,8 @@ body{
   margin-bottom:14px;
 }
 .header img{
-  width:52px;
-  height:52px;
+  width:56px;
+  height:56px;
   border-radius:50%;
   object-fit:cover;
   background:#ddd;
@@ -46,44 +41,11 @@ body{
   font-size:20px;
 }
 
-/* Buttons */
-button{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border:none;
-  border-radius:12px;
-  background:#2ecc71;
-  color:#fff;
-  font-size:16px;
-}
-
-/* Sections */
-.section{
-  background:#f7f7f7;
-  padding:14px;
-  border-radius:14px;
-  margin-top:14px;
-}
-.section h3{
-  margin:0 0 10px;
-  font-size:17px;
-}
-
-/* Habits */
-label{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin:8px 0;
-  font-size:16px;
-}
-
-/* Inputs */
+/* INPUTS */
 input[type="text"]{
   width:100%;
-  padding:10px;
-  border-radius:10px;
+  padding:8px;
+  border-radius:8px;
   border:1px solid #ccc;
   margin-top:6px;
 }
@@ -91,10 +53,42 @@ input[type="file"]{
   margin-top:6px;
 }
 
-/* Chart */
-canvas{
-  width:100% !important;
-  height:220px !important;
+/* BUTTON */
+button{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border:none;
+  border-radius:10px;
+  background:#2ecc71;
+  color:#fff;
+  font-size:16px;
+}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;margin-top:16px}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:480px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+  font-size:14px;
+}
+th{
+  background:#f2f2f2;
+}
+tr.today{
+  background:#fff6c1;
+}
+input[type="checkbox"]{
+  transform:scale(1.2);
+}
+input[type="checkbox"]:disabled{
+  opacity:0.3;
 }
 </style>
 </head>
@@ -103,147 +97,129 @@ canvas{
 
 <div class="app">
 
-  <!-- HEADER -->
-  <div class="header">
-    <img id="profilePic" src="" alt="User">
-    <div>
-      <h2 id="userNameText">My Fitness App</h2>
-      <input type="text" id="userNameInput" placeholder="Enter your name">
-    </div>
+<!-- HEADER -->
+<div class="header">
+  <img id="profilePic">
+  <div style="flex:1">
+    <h2 id="userNameText">My Fitness App</h2>
+    <input type="text" id="userNameInput" placeholder="Enter your name">
   </div>
+</div>
 
-  <input type="file" id="photoInput" accept="image/*">
+<input type="file" id="photoInput" accept="image/*">
+<button onclick="saveProfile()">Save Profile</button>
 
-  <button onclick="saveProfile()">Save Profile</button>
+<button onclick="enableSound()">🔊 Enable Sound</button>
 
-  <button onclick="enableSound()">🔊 Enable Sound</button>
-
-  <!-- HABITS -->
-  <div class="section">
-    <h3>✅ Today Habits</h3>
-    <label><input type="checkbox" onchange="tick()"> Exercise</label>
-    <label><input type="checkbox" onchange="tick()"> Running</label>
-    <label><input type="checkbox" onchange="tick()"> Study</label>
-  </div>
-
-  <!-- CHART -->
-  <div class="section">
-    <h3>📊 Monthly Progress</h3>
-    <canvas id="chart"></canvas>
-  </div>
+<!-- HABIT CHART -->
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Day</th>
+  <th>Exercise</th>
+  <th>Running</th>
+  <th>Study</th>
+</tr>
+</thead>
+<tbody id="chartBody"></tbody>
+</table>
+</div>
 
 </div>
 
-<!-- Tick Sound -->
+<!-- SOUND -->
 <audio id="tickSound" preload="auto">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 
 <script>
-/* ---------- PROFILE ---------- */
+/* ===== PROFILE (NO RESET BUG) ===== */
 const nameInput = document.getElementById("userNameInput");
 const nameText = document.getElementById("userNameText");
 const profilePic = document.getElementById("profilePic");
 
 function saveProfile(){
-  const name = nameInput.value.trim();
-  if(name){
-    localStorage.setItem("userName", name);
-    nameText.innerText = "👤 " + name;
+  if(nameInput.value.trim()){
+    localStorage.setItem("userName", nameInput.value.trim());
   }
-
-  const file = document.getElementById("photoInput").files[0];
+  const file = photoInput.files[0];
   if(file){
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = ()=>{
       localStorage.setItem("profilePic", reader.result);
       profilePic.src = reader.result;
     };
     reader.readAsDataURL(file);
   }
+  loadProfile();
 }
 
 function loadProfile(){
-  const savedName = localStorage.getItem("userName");
-  const savedPic = localStorage.getItem("profilePic");
-  if(savedName) nameText.innerText = "👤 " + savedName;
-  if(savedPic) profilePic.src = savedPic;
+  const n = localStorage.getItem("userName");
+  const p = localStorage.getItem("profilePic");
+  if(n) nameText.innerText = "👤 " + n;
+  if(p) profilePic.src = p;
 }
 loadProfile();
 
-/* ---------- SOUND ---------- */
-let soundEnabled = false;
-const sound = document.getElementById("tickSound");
-
+/* ===== SOUND ===== */
+let soundEnabled=false;
+const sound=document.getElementById("tickSound");
 function enableSound(){
   sound.play().then(()=>{
-    sound.pause();
-    sound.currentTime = 0;
-    soundEnabled = true;
-    alert("Sound enabled ✅");
+    sound.pause(); sound.currentTime=0;
+    soundEnabled=true;
+    alert("Sound enabled");
   });
 }
 
-/* ---------- HABITS + DATA ---------- */
-function tick(){
+/* ===== HABIT CHART ===== */
+const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const today=new Date(); today.setHours(0,0,0,0);
+
+function renderChart(){
+  const body=document.getElementById("chartBody");
+  body.innerHTML="";
+  const year=today.getFullYear();
+  const month=today.getMonth();
+  const totalDays=new Date(year,month+1,0).getDate();
+
+  for(let d=1;d<=totalDays;d++){
+    const date=new Date(year,month,d);
+    const isToday=date.toDateString()===today.toDateString();
+    const row=document.createElement("tr");
+    if(isToday) row.classList.add("today");
+
+    row.innerHTML=`
+      <td>${d}</td>
+      <td>${days[date.getDay()]}</td>
+      ${[0,1,2].map(i=>{
+        const key=\`habit_${year}_${month}_${d}_${i}\`;
+        const checked=localStorage.getItem(key)==="1";
+        return \`
+        <td>
+          <input type="checkbox"
+          ${checked?"checked":""}
+          ${!isToday?"disabled":""}
+          onchange="saveHabit('${key}',this)">
+        </td>\`;
+      }).join("")}
+    `;
+    body.appendChild(row);
+  }
+}
+
+function saveHabit(key,el){
+  localStorage.setItem(key, el.checked?"1":"0");
   if(soundEnabled){
-    sound.currentTime = 0;
+    sound.currentTime=0;
     sound.play();
   }
-
-  const day = new Date().getDate();
-  let count = parseInt(localStorage.getItem("day_"+day) || 0);
-  localStorage.setItem("day_"+day, count + 1);
-  loadChart();
 }
 
-/* ---------- CHART ---------- */
-let chart;
-
-function loadChart(){
-  const daysInMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth()+1,
-    0
-  ).getDate();
-
-  const labels = [];
-  const data = [];
-
-  for(let d=1; d<=daysInMonth; d++){
-    labels.push(d);
-    let v = parseInt(localStorage.getItem("day_"+d) || 0);
-    data.push(Math.min(v * 33, 100)); // % logic
-  }
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("chart"),{
-    type:"line",
-    data:{
-      labels: labels,
-      datasets:[{
-        label:"Progress %",
-        data: data,
-        borderColor:"#2ecc71",
-        backgroundColor:"rgba(46,204,113,0.15)",
-        tension:0.4,
-        fill:true,
-        pointRadius:4
-      }]
-    },
-    options:{
-      scales:{
-        y:{min:0,max:100}
-      },
-      plugins:{
-        legend:{display:false}
-      }
-    }
-  });
-}
-
-loadChart();
+renderChart();
 </script>
 
 </body>
