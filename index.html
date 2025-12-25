@@ -6,91 +6,71 @@
 <title>Fitness Habit App</title>
 
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;transition:0.25s}
 
-/* THEMES */
 :root{
-  --bg:#e8f5e9; --card:#fff; --accent:#2ecc71;
+  --bg:#e8f5e9; --card:#fff; --accent:#2ecc71; --hover:#27ae60;
 }
-body.theme-1{--bg:#e8f5e9;--card:#fff;--accent:#2ecc71;}
-body.theme-2{--bg:#e3f2fd;--card:#fff;--accent:#2196f3;}
-body.theme-3{--bg:#fff3e0;--card:#fff;--accent:#ff9800;}
-body.theme-4{--bg:#fce4ec;--card:#fff;--accent:#e91e63;}
-body.theme-5{--bg:#ede7f6;--card:#fff;--accent:#673ab7;}
-body.theme-6{--bg:#f3e5f5;--card:#fff;--accent:#9c27b0;}
-body.theme-7{--bg:#e0f2f1;--card:#fff;--accent:#009688;}
-body.theme-8{--bg:#fbe9e7;--card:#fff;--accent:#ff5722;}
-body.theme-9{--bg:#eceff1;--card:#fff;--accent:#607d8b;}
-body.theme-10{--bg:#fffde7;--card:#fff;--accent:#fbc02d;}
-
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:Segoe UI,Arial;
-  padding:12px;
-}
+body{margin:0;background:var(--bg);font-family:Segoe UI,Arial;padding:12px}
 .app{
-  max-width:480px;
-  margin:auto;
-  background:var(--card);
-  padding:16px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  max-width:480px;margin:auto;background:var(--card);
+  padding:16px;border-radius:18px;box-shadow:0 10px 25px rgba(0,0,0,.2)
 }
+
+/* BUTTONS */
+button{
+  width:100%;padding:10px;margin:6px 0;font-size:15px;
+  border-radius:10px;border:none;background:var(--accent);color:#fff;
+  cursor:pointer;transition:0.2s;
+}
+button:hover{background:var(--hover)}
+button:active{transform:scale(.92);opacity:.8}
 
 /* PROFILE */
-.profile{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:8px;
-}
-.profile img{
-  width:60px;height:60px;
-  border-radius:50%;object-fit:cover;background:#ccc;
-}
+.profile{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.profile img{width:60px;height:60px;border-radius:50%;object-fit:cover;background:#ccc;transition:.4s}
 .stats{font-size:14px}
 .stats div{margin:2px 0}
 
+/* HABIT EDIT POPUP */
+#habitEditor{
+  background:#fff;padding:10px;border-radius:12px;margin:10px 0;
+  box-shadow:0 4px 14px rgba(0,0,0,.2);
+  display:none;
+}
+
 /* TABLE */
 .table-wrap{overflow-x:auto}
-table{
-  width:100%;border-collapse:collapse;
-  font-size:13px;min-width:720px
-}
-th,td{
-  border:1px solid #ccc;padding:6px;text-align:center
-}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
 th{background:#e7e7e7}
 .today{background:#fff4a8}
-input[type=checkbox]{transform:scale(1.2)}
-
-button,input{
-  width:100%;padding:10px;margin:6px 0;font-size:15px;
-  border-radius:10px;
-}
-button{border:none;background:var(--accent);color:#fff}
-.card{background:#f1f1f1;padding:12px;border-radius:14px;margin-top:12px}
+input[type=checkbox]{transform:scale(1.2);cursor:pointer}
+td:hover{background:#d7ffd7}
 </style>
 </head>
-
 <body>
 
 <div class="app">
 
-<!-- PROFILE HEADER -->
+<!-- PROFILE -->
 <div class="profile">
-  <img id="profilePic">
-  <div class="stats">
-    <div id="userNameShow">👤 Your Name</div>
-    <div id="streakShow">🔥 Streak: 0</div>
-    <div id="statsShow">💧0 | ⚖️0</div>
-  </div>
+<img id="profilePic">
+<div class="stats">
+  <div id="userNameShow">👤 Your Name</div>
+  <div id="streakShow">🔥 Streak: 0</div>
+  <div id="statsShow">💧0 | ⚖️0</div>
+</div>
 </div>
 
 <input type="text" id="userName" placeholder="Enter name">
 <input type="file" id="photoInput" accept="image/*">
 <button onclick="saveProfile()">Save Profile</button>
+
+<button onclick="editHabits()">✏️ Edit Habits</button>
+
+<div id="habitEditor"></div>
+
 <button onclick="unlockSound()">🔊 Enable Tick Sound</button>
 <button onclick="changeTheme()">🎨 Change Theme</button>
 
@@ -102,187 +82,198 @@ button{border:none;background:var(--accent);color:#fff}
 <button onclick="changeWeek(1)">Next ➡</button>
 </div>
 
-<div class="table-wrap card">
+<!-- HABITS TABLE -->
+<div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Date</th><th>Day</th>
-<th>Goal</th><th>Sleep</th><th>Wake</th>
-<th>Food</th><th>Study</th><th>Run</th>
-<th>Exercise</th><th>Book</th>
-<th>%</th>
-</tr>
+<tr id="habitHeadRow"></tr>
 </thead>
 <tbody id="chartBody"></tbody>
 </table>
 </div>
 
-<div class="card">
-<h3>💧 Water</h3>
-<input type="number" id="water" placeholder="glasses">
-<button onclick="saveWater()">Save</button>
+<!-- WATER -->
+<input type="number" id="water" placeholder="Water">
+<button onclick="saveWater()">Save Water</button>
+
+<!-- WEIGHT -->
+<input type="number" step="0.1" id="weight" placeholder="Weight KG">
+<button onclick="saveWeight()">Save Weight</button>
+
+<!-- ALARM -->
+<input type="time" id="alarmTime">
+<button onclick="setAlarm()">⏰ Set Alarm</button>
+
 </div>
 
-<div class="card">
-<h3>⚖️ Weight</h3>
-<input type="number" step="0.1" id="weight" placeholder="kg">
-<button onclick="saveWeight()">Save</button>
-</div>
-
-</div>
-
-<audio id="tickSound" preload="auto">
+<audio id="tickSound">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
+</audio>
+<audio id="alarmSound">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3">
 </audio>
 
 <script>
-/* ===== CORE VARIABLES ===== */
-const habits = 8;
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let habits=8;
 let today=new Date(); today.setHours(0,0,0,0);
-let weekOffset = 0;
-
-/* ===== SOUND ===== */
+let weekOffset=0;
 let soundReady=false;
-function unlockSound(){
-  const a=document.getElementById("tickSound");
-  a.play().then(()=>{
-    a.pause(); a.currentTime=0;
-    soundReady=true;
-  });
-}
 
-/* ===== PROFILE ===== */
+/* PROFILE */
 function saveProfile(){
-  let n=document.getElementById("userName").value;
-  if(n) localStorage.setItem("userName",n);
-
-  let f=document.getElementById("photoInput").files[0];
-  if(f){
-    let r=new FileReader();
-    r.onload=()=>localStorage.setItem("profilePic",r.result);
-    r.readAsDataURL(f);
-  }
-  loadProfile();
+let n=userName.value; if(n){localStorage.setItem("name",n);}
+let f=photoInput.files[0];
+if(f){
+  profilePic.classList.add("fadeOut");
+  let r=new FileReader();
+  r.onload=()=>{
+    localStorage.setItem("pic",r.result);
+    profilePic.src=r.result;
+    profilePic.classList.remove("fadeOut");
+  };
+  r.readAsDataURL(f);
+}
+loadProfile();
 }
 function loadProfile(){
-  let n=localStorage.getItem("userName")||"Your Name";
-  let p=localStorage.getItem("profilePic");
-  userNameShow.innerText="👤 "+n;
-  if(p) profilePic.src=p;
-  updateStats();
-  updateStreak();
+userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
+profilePic.src=localStorage.getItem("pic")||"";
+updateStats();
+updateStreak();
 }
 
-/* ===== THEME ===== */
-let theme=Number(localStorage.getItem("theme"))||1;
-function applyTheme(){
-  document.body.className="theme-"+theme;
+/* HABIT EDIT */
+function editHabits(){
+habitEditor.innerHTML="";
+let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
+for(let i=0;i<habits;i++){
+habitEditor.innerHTML+=`<input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
 }
+habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
+habitEditor.style.display="block";
+}
+function saveHabits(){
+let arr=[];
+for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
+localStorage.setItem("habitNames",JSON.stringify(arr));
+habitEditor.style.display="none";
+render();
+}
+
+/* ALARM */
+function setAlarm(){
+let t=alarmTime.value;
+if(!t) return alert("Set a time first");
+localStorage.setItem("alarm",t);
+Notification.requestPermission();
+alert("Alarm ready! Keep app open or add to Home Screen");
+}
+setInterval(()=>{
+let t=localStorage.getItem("alarm"); if(!t) return;
+let n=new Date();
+let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+if(cur===t){
+alarmSound.play();
+new Notification("⏰ ALARM!",{body:"Habit time!"});
+}
+},10000);
+
+/* SOUND */
+function unlockSound(){
+tickSound.play().then(()=>{
+  tickSound.pause();
+  tickSound.currentTime=0;
+  soundReady=true;
+});
+}
+
+/* THEME */
+let theme=+localStorage.getItem("theme")||1;
 function changeTheme(){
-  theme++; if(theme>10) theme=1;
-  localStorage.setItem("theme",theme);
-  applyTheme();
+theme++; if(theme>10) theme=1;
+localStorage.setItem("theme",theme);
+document.body.className="theme-"+theme;
+}
+document.body.className="theme-"+theme;
+
+/* WATER & WEIGHT */
+function saveWater(){localStorage.setItem("water",water.value);updateStats();}
+function saveWeight(){localStorage.setItem("weight",weight.value);updateStats();}
+function updateStats(){statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`}
+
+/* STREAK */
+function updateStreak(){
+let s=0;
+let d=new Date(today);
+while(true){
+  let rowDone=false;
+  for(let i=0;i<habits;i++){
+    let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
+    if(localStorage.getItem(k)==="1") rowDone=true;
+  }
+  if(!rowDone) break;
+  s++; d.setDate(d.getDate()-1);
+}
+localStorage.setItem("streak",s);
+streakShow.innerText="🔥 Streak: "+s;
 }
 
-/* ===== TABLE RENDER ===== */
-function changeWeek(v){weekOffset+=v; render();}
+/* TABLE */
+function changeWeek(v){weekOffset+=v;render();}
 function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
 function render(){
-  let start = weekStart(new Date(today.getTime()+weekOffset*7*86400000));
-  monthYear.innerText = start.toLocaleString("default",{ month:"long",year:"numeric" });
-  weekTitle.innerText = "Week of "+start.toDateString();
+let start = weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+monthYear.innerText = start.toLocaleString("default",{month:"long",year:"numeric"});
+weekTitle.innerText = start.toDateString();
 
-  let tbody=document.getElementById("chartBody");
-  tbody.innerHTML="";
+/* HEADERS */
+let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
+let row=`<th>Date</th><th>Day</th>`;
+for(let i=0;i<habits;i++) row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;
+row+=`<th>%</th>`;
+habitHeadRow.innerHTML=row;
 
-  for(let i=0;i<7;i++){
-    let d=new Date(start); d.setDate(start.getDate()+i);
-    if(Math.abs(d - today) > 40*86400000) continue; // stability
-
-    let isToday=d.toDateString()===today.toDateString();
-    let tr=document.createElement("tr");
-    if(isToday) tr.classList.add("today");
-
-    let row=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
-    for(let h=0;h<habits;h++){
-      let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
-      let ch = localStorage.getItem(key)==="1";
-      row+=`<td>
-      <input type="checkbox"
-      ${ch?'checked':''}
-      ${!isToday?'disabled':''}
-      onclick="saveHabit('${key}',this)">
-      </td>`;
-    }
-    row+=`<td class="per"></td>`;
-    tr.innerHTML=row;
-    tbody.appendChild(tr);
-  }
-  calcPercent();
+/* BODY */
+chartBody.innerHTML="";
+for(let i=0;i<7;i++){
+let d=new Date(start); d.setDate(start.getDate()+i);
+let isToday = d.toDateString()===today.toDateString();
+let tr=document.createElement("tr");
+if(isToday) tr.classList.add("today");
+let r=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
+for(let h=0;h<habits;h++){
+  let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
+  let ch = localStorage.getItem(key)==="1";
+  r+=`<td><input type="checkbox" ${ch?'checked':''}
+  ${!isToday?'disabled':''}
+  onclick="saveTick('${key}',this)">
+  </td>`;
+}
+r+=`<td class="per">0%</td>`;
+tr.innerHTML=r; chartBody.appendChild(tr);
+}
+calcPercent();
 }
 
-/* ===== HABITS SAVE ===== */
-function saveHabit(key,el){
-  localStorage.setItem(key,el.checked?"1":"0");
-  if(soundReady){
-    tickSound.currentTime=0;
-    tickSound.play();
-  }
-  updateStreak(); calcPercent();
+function saveTick(k,el){
+localStorage.setItem(k,el.checked?"1":"0");
+if(soundReady){tickSound.currentTime=0; tickSound.play();}
+updateStreak(); calcPercent();
 }
 
-/* ===== PERCENT ===== */
 function calcPercent(){
-  document.querySelectorAll(".per").forEach(per=>{
-    let row=per.parentNode;
-    let done=row.querySelectorAll("input:checked").length;
-    per.innerText=Math.round(done/habits*100)+"%";
-  });
-}
-
-/* ===== STREAK (Perfect Fix) ===== */
-function updateStreak(){
-  let s=0;
-  let d=new Date(today);
-
-  while(true){
-    let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_0`;
-    let rowHasTick=false;
-
-    for(let i=0;i<habits;i++){
-      let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
-      if(localStorage.getItem(k)==="1") rowHasTick=true;
-    }
-
-    if(!rowHasTick) break;
-    s++;
-    d.setDate(d.getDate()-1);
-  }
-
-  streakShow.innerText="🔥 Streak: "+s;
-  localStorage.setItem("streak",s);
-}
-
-/* ===== WATER/WEIGHT ===== */
-function saveWater(){
-  localStorage.setItem("water",water.value);
-  updateStats();
-}
-function saveWeight(){
-  localStorage.setItem("weight",weight.value);
-  updateStats();
-}
-function updateStats(){
-  statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
+document.querySelectorAll(".per").forEach(per=>{
+let row=per.parentNode;
+let done=row.querySelectorAll("input:checked").length;
+per.innerText=Math.round(done/habits*100)+"%";
+});
 }
 
 /* INIT */
-applyTheme();
 loadProfile();
 render();
 </script>
 </body>
 </html>
-
