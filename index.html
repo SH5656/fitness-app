@@ -4,97 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fitness Habit App</title>
-<meta name="theme-color" content="#2ecc71">
 
 <style>
 *{box-sizing:border-box}
-
-/* ===== THEMES ===== */
 :root{
   --bg:#e8f5e9; --card:#fff; --accent:#2ecc71;
 }
-body.theme-1{--bg:#e8f5e9;--card:#fff;--accent:#2ecc71;}
-body.theme-2{--bg:#e3f2fd;--card:#fff;--accent:#2196f3;}
-body.theme-3{--bg:#fff3e0;--card:#fff;--accent:#ff9800;}
-body.theme-4{--bg:#fce4ec;--card:#fff;--accent:#e91e63;}
-body.theme-5{--bg:#ede7f6;--card:#fff;--accent:#673ab7;}
-body.theme-6{--bg:#f3e5f5;--card:#fff;--accent:#9c27b0;}
-body.theme-7{--bg:#e0f2f1;--card:#fff;--accent:#009688;}
-body.theme-8{--bg:#fbe9e7;--card:#fff;--accent:#ff5722;}
-body.theme-9{--bg:#eceff1;--card:#fff;--accent:#607d8b;}
-body.theme-10{--bg:#fffde7;--card:#fff;--accent:#fbc02d;}
-
-body{
-  margin:0;
-  font-family:Segoe UI,Arial;
-  background:var(--bg);
-  padding:12px;
-}
-
+body{margin:0;font-family:Segoe UI,Arial;background:var(--bg);padding:12px;}
 .app{
-  max-width:480px;
-  margin:auto;
-  background:var(--card);
-  padding:14px;
-  border-radius:18px;
+  max-width:480px;margin:auto;background:var(--card);
+  padding:16px;border-radius:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.2);
 }
 
-h2,h3{text-align:center;margin:6px 0}
-
-button{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-  border:none;
-  border-radius:10px;
-  background:var(--accent);
-  color:#fff;
-  font-size:15px;
+/* Header */
+.profile-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:10px;
 }
-
-.card{
-  background:#f9f9f9;
-  padding:10px;
-  border-radius:12px;
-  margin:10px 0;
+.profile-header img{
+  width:60px;height:60px;border-radius:50%;object-fit:cover;background:#ccc;
 }
+.profile-info{
+  font-size:14px;
+}
+.profile-info div{margin:2px 0;}
+.streak{font-size:16px;font-weight:bold;color:var(--accent);}
 
+button,input{width:100%;padding:10px;margin:6px 0;font-size:15px;border-radius:10px;}
+
+button{background:var(--accent);color:#fff;border:none;}
+.card{background:#f2f2f2;padding:12px;border-radius:14px;margin-top:12px}
+
+/* Table */
 .table-wrap{overflow-x:auto}
-table{
-  min-width:720px;
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-th,td{padding:6px;text-align:center}
-th{background:#f1f1f1}
-tr.today{background:#fff6c1}
+table{min-width:720px;width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid #ccc;padding:6px;text-align:center}
+th{background:#e7e7e7}
+.today{background:#fff6b0}
 input[type=checkbox]{transform:scale(1.2)}
-input[type=checkbox]:disabled{opacity:.3}
-.progress{font-weight:bold;color:var(--accent)}
 
-.timer{font-size:22px;text-align:center}
 </style>
 </head>
-
-<body class="theme-1">
+<body>
 
 <div class="app">
 
-<h2 id="monthYear"></h2>
-<h3 id="weekTitle"></h3>
-<div id="streak">🔥 Streak: 0 days</div>
+<!-- HEADER -->
+<div class="profile-header">
+  <img id="profilePic">
+  <div class="profile-info">
+    <div id="userNameShow">👤 Your Name</div>
+    <div class="streak" id="streakShow">🔥 Streak: 0</div>
+    <div id="statsShow">💧0 | ⚖️0</div>
+  </div>
+</div>
 
+<input type="text" id="userName" placeholder="Enter your name">
+<input type="file" id="photoInput" accept="image/*">
+<button onclick="saveProfile()">Save Profile</button>
+
+<button onclick="unlockSound()">🔊 Enable Sound</button>
 <button onclick="changeTheme()">🎨 Change Theme</button>
 
-<div class="card">
+<h2 id="monthYear"></h2>
+<h3 id="weekTitle"></h3>
+
+<!-- WEEK NAVIGATION -->
 <div style="display:flex;gap:6px">
 <button onclick="changeWeek(-1)">⬅ Prev</button>
 <button onclick="changeWeek(1)">Next ➡</button>
 </div>
-</div>
 
+<!-- HABIT TABLE -->
 <div class="table-wrap card">
 <table>
 <thead>
@@ -109,27 +90,23 @@ input[type=checkbox]:disabled{opacity:.3}
 </table>
 </div>
 
+<!-- WATER -->
 <div class="card">
-<h3>⏱ Workout Timer</h3>
-<div class="timer" id="timer">00:00</div>
-<button onclick="startTimer()">Start</button>
-<button onclick="stopTimer()">Stop</button>
-</div>
-
-<div class="card">
-<h3>💧 Water (glasses)</h3>
-<input type="number" id="water">
+<h3>💧 Water</h3>
+<input type="number" id="water" placeholder="glasses">
 <button onclick="saveWater()">Save</button>
 </div>
 
+<!-- WEIGHT -->
 <div class="card">
-<h3>⚖️ Weight (kg)</h3>
-<input type="number" step="0.1" id="weight">
+<h3>⚖️ Weight</h3>
+<input type="number" step="0.1" id="weight" placeholder="KG">
 <button onclick="saveWeight()">Save</button>
 </div>
 
+<!-- REMINDER -->
 <div class="card">
-<h3>🔔 Daily Reminder</h3>
+<h3>🔔 Reminder</h3>
 <input type="time" id="reminderTime">
 <button onclick="setReminder()">Set Reminder</button>
 </div>
@@ -142,37 +119,56 @@ input[type=checkbox]:disabled{opacity:.3}
 </audio>
 
 <script>
-/* ===== BASIC ===== */
-const habits=8;
+/* CONSTANTS */
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const today=new Date(); today.setHours(0,0,0,0);
+const habits=8;
+let today=new Date(); today.setHours(0,0,0,0);
 let weekOffset=0;
-const tickSound=document.getElementById("tickSound");
 
-/* ===== THEME ===== */
-let theme=localStorage.getItem("theme")||1;
-document.body.className="theme-"+theme;
-function changeTheme(){
-  theme++; if(theme>10) theme=1;
-  document.body.className="theme-"+theme;
-  localStorage.setItem("theme",theme);
+/* SOUND */
+let soundReady=false;
+function unlockSound(){
+  const a=document.getElementById("tickSound");
+  a.play().then(()=>{
+    a.pause(); a.currentTime=0;
+    soundReady=true;
+    alert("Sound Enabled!");
+  });
 }
 
-/* ===== HEADER ===== */
-document.getElementById("monthYear").innerText =
-today.toLocaleString("default",{month:"long",year:"numeric"});
-
-/* ===== WEEK ===== */
-function weekStart(d){
-  let x=new Date(d); x.setDate(x.getDate()-x.getDay()); return x;
+/* PROFILE */
+function saveProfile(){
+  let n=document.getElementById("userName").value;
+  if(n){
+    localStorage.setItem("userName",n);
+  }
+  const file=document.getElementById("photoInput").files[0];
+  if(file){
+    const r=new FileReader();
+    r.onload=()=>localStorage.setItem("profilePic",r.result);
+    r.readAsDataURL(file);
+  }
+  loadProfile();
 }
+
+function loadProfile(){
+  let n=localStorage.getItem("userName")||"Your Name";
+  let p=localStorage.getItem("profilePic");
+  userNameShow.innerText="👤 "+n;
+  if(p) profilePic.src=p;
+  updateStats();
+  updateStreak();
+}
+
+/* HABITS TABLE */
 function changeWeek(v){weekOffset+=v;render();}
+function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
-/* ===== RENDER ===== */
 function render(){
-  const start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+  let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+  document.getElementById("monthYear").innerText=today.toLocaleString("default",{month:"long",year:"numeric"});
   document.getElementById("weekTitle").innerText="Week of "+start.toDateString();
-  const body=document.getElementById("chartBody"); body.innerHTML="";
+  let body=document.getElementById("chartBody"); body.innerHTML="";
   for(let i=0;i<7;i++){
     let d=new Date(start); d.setDate(start.getDate()+i);
     if(d.getMonth()!=today.getMonth()) continue;
@@ -182,93 +178,88 @@ function render(){
     let html=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
     for(let h=0;h<habits;h++){
       let key=`${today.getFullYear()}-${today.getMonth()}_${d.getDate()}_${h}`;
-      let checked=localStorage.getItem(key)==="true";
+      let ch=localStorage.getItem(key)==="1";
       html+=`<td><input type="checkbox"
-      ${checked?"checked":""}
-      ${!isToday?"disabled":""}
-      onclick="saveTick('${key}',this)"></td>`;
+       ${ch?'checked':''}
+       onclick="saveHabit('${key}',this)"
+       ${!isToday?'disabled':''}></td>`;
     }
-    html+=`<td class="progress">0%</td>`;
-    row.innerHTML=html; body.appendChild(row);
+    html+=`<td class="per"></td>`;
+    row.innerHTML=html;
+    body.appendChild(row);
   }
-  calc();
+  calcPercent();
 }
 
-/* ===== TICK (SOUND FIXED) ===== */
-function saveTick(key,el){
-  localStorage.setItem(key,el.checked);
-  tickSound.currentTime=0;
-  tickSound.play();
-  localStorage.setItem("done_"+today.toDateString(),"yes");
-  updateStreak(); calc();
+/* HABIT SAVE */
+function saveHabit(key,el){
+  localStorage.setItem(key,el.checked?'1':'0');
+  if(soundReady){
+    tickSound.currentTime=0;
+    tickSound.play();
+  }
+  updateStreak(); calcPercent();
 }
 
-/* ===== PROGRESS ===== */
-function calc(){
+/* PERCENT CALC */
+function calcPercent(){
   document.querySelectorAll("tbody tr").forEach(r=>{
-    let c=0; r.querySelectorAll("input").forEach(b=>{if(b.checked)c++});
-    r.querySelector(".progress").innerText=Math.round((c/habits)*100)+"%";
+    let boxes=r.querySelectorAll("input");
+    let done=[...boxes].filter(b=>b.checked).length;
+    r.querySelector(".per").innerText=Math.round(done/habits*100)+"%";
   });
 }
 
-/* ===== STREAK ===== */
+/* STREAK FIXED */
 function updateStreak(){
-  let y=new Date(Date.now()-86400000).toDateString();
-  let t=today.toDateString();
-  let s=parseInt(localStorage.getItem("streak")||0);
-  if(localStorage.getItem("done_"+t)!=="yes") return;
-  if(localStorage.getItem("done_"+y)==="yes") s++; else s=1;
+  let s=0;
+  let d=new Date(today);
+  while(true){
+    let k=`done_${d.toDateString()}`;
+    if(!localStorage.getItem(k)) break;
+    s++; d.setDate(d.getDate()-1);
+  }
+  let todayKey="done_"+today.toDateString();
+  if(document.querySelector(".today input:checked")) localStorage.setItem(todayKey,"yes");
+
   localStorage.setItem("streak",s);
-  document.getElementById("streak").innerText="🔥 Streak: "+s+" days";
+  streakShow.innerText="🔥 Streak: "+s;
 }
-document.getElementById("streak").innerText=
-"🔥 Streak: "+(localStorage.getItem("streak")||0)+" days";
 
-/* ===== TIMER ===== */
-let sec=0,interval;
-function startTimer(){
-  clearInterval(interval);
-  interval=setInterval(()=>{
-    sec++;
-    let m=Math.floor(sec/60),s=sec%60;
-    timer.innerText=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
-  },1000);
-}
-function stopTimer(){clearInterval(interval)}
-
-/* ===== WATER / WEIGHT ===== */
+/* WATER / WEIGHT */
 function saveWater(){
-  localStorage.setItem("water_"+today.toDateString(),
-  document.getElementById("water").value);
+  localStorage.setItem("water",document.getElementById("water").value||0);
+  updateStats();
 }
 function saveWeight(){
-  localStorage.setItem("weight_"+today.toDateString(),
-  document.getElementById("weight").value);
+  localStorage.setItem("weight",document.getElementById("weight").value||0);
+  updateStats();
+}
+function updateStats(){
+  let w=localStorage.getItem("water")||0;
+  let kg=localStorage.getItem("weight")||0;
+  statsShow.innerText=`💧${w} | ⚖️${kg}`;
 }
 
-/* ===== REMINDER (WORKING METHOD) ===== */
+/* THEME */
+let theme=localStorage.getItem("theme")||1;
+document.body.className="theme-"+theme;
+function changeTheme(){
+  theme++; if(theme>10) theme=1;
+  localStorage.setItem("theme",theme);
+  document.body.className="theme-"+theme;
+}
+
+/* REMINDER */
 function setReminder(){
   let t=document.getElementById("reminderTime").value;
-  if(!t) return alert("Select time");
+  if(!t) return;
   localStorage.setItem("reminderTime",t);
-  Notification.requestPermission().then(()=>{
-    alert("Reminder saved.\nApp must be added to Home Screen.");
-  });
+  Notification.requestPermission();
+  alert("Reminder saved");
 }
 
-setInterval(()=>{
-  let t=localStorage.getItem("reminderTime");
-  if(!t) return;
-  let n=new Date();
-  let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
-  if(cur===t){
-    new Notification("🏋️ Fitness Reminder",{
-      body:"Time to complete today’s habits 💪"
-    });
-  }
-},60000);
-
-render();
+loadProfile(); render();
 </script>
 
 </body>
