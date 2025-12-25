@@ -7,75 +7,101 @@
 
 <style>
 *{box-sizing:border-box}
+
+/* THEMES */
 :root{
   --bg:#e8f5e9; --card:#fff; --accent:#2ecc71;
 }
-body{margin:0;font-family:Segoe UI,Arial;background:var(--bg);padding:12px;}
+body.theme-1{--bg:#e8f5e9;--card:#fff;--accent:#2ecc71;}
+body.theme-2{--bg:#e3f2fd;--card:#fff;--accent:#2196f3;}
+body.theme-3{--bg:#fff3e0;--card:#fff;--accent:#ff9800;}
+body.theme-4{--bg:#fce4ec;--card:#fff;--accent:#e91e63;}
+body.theme-5{--bg:#ede7f6;--card:#fff;--accent:#673ab7;}
+body.theme-6{--bg:#f3e5f5;--card:#fff;--accent:#9c27b0;}
+body.theme-7{--bg:#e0f2f1;--card:#fff;--accent:#009688;}
+body.theme-8{--bg:#fbe9e7;--card:#fff;--accent:#ff5722;}
+body.theme-9{--bg:#eceff1;--card:#fff;--accent:#607d8b;}
+body.theme-10{--bg:#fffde7;--card:#fff;--accent:#fbc02d;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Segoe UI,Arial;
+  padding:12px;
+}
 .app{
-  max-width:480px;margin:auto;background:var(--card);
-  padding:16px;border-radius:18px;
+  max-width:480px;
+  margin:auto;
+  background:var(--card);
+  padding:16px;
+  border-radius:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.2);
 }
 
-/* Header */
-.profile-header{
-  display:flex;align-items:center;gap:12px;margin-bottom:10px;
+/* PROFILE */
+.profile{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:8px;
 }
-.profile-header img{
-  width:60px;height:60px;border-radius:50%;object-fit:cover;background:#ccc;
+.profile img{
+  width:60px;height:60px;
+  border-radius:50%;object-fit:cover;background:#ccc;
 }
-.profile-info{
-  font-size:14px;
-}
-.profile-info div{margin:2px 0;}
-.streak{font-size:16px;font-weight:bold;color:var(--accent);}
+.stats{font-size:14px}
+.stats div{margin:2px 0}
 
-button,input{width:100%;padding:10px;margin:6px 0;font-size:15px;border-radius:10px;}
-
-button{background:var(--accent);color:#fff;border:none;}
-.card{background:#f2f2f2;padding:12px;border-radius:14px;margin-top:12px}
-
-/* Table */
+/* TABLE */
 .table-wrap{overflow-x:auto}
-table{min-width:720px;width:100%;border-collapse:collapse;font-size:13px}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
+table{
+  width:100%;border-collapse:collapse;
+  font-size:13px;min-width:720px
+}
+th,td{
+  border:1px solid #ccc;padding:6px;text-align:center
+}
 th{background:#e7e7e7}
-.today{background:#fff6b0}
+.today{background:#fff4a8}
 input[type=checkbox]{transform:scale(1.2)}
 
+button,input{
+  width:100%;padding:10px;margin:6px 0;font-size:15px;
+  border-radius:10px;
+}
+button{border:none;background:var(--accent);color:#fff}
+.card{background:#f1f1f1;padding:12px;border-radius:14px;margin-top:12px}
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
-<!-- HEADER -->
-<div class="profile-header">
+<!-- PROFILE HEADER -->
+<div class="profile">
   <img id="profilePic">
-  <div class="profile-info">
+  <div class="stats">
     <div id="userNameShow">👤 Your Name</div>
-    <div class="streak" id="streakShow">🔥 Streak: 0</div>
+    <div id="streakShow">🔥 Streak: 0</div>
     <div id="statsShow">💧0 | ⚖️0</div>
   </div>
 </div>
 
-<input type="text" id="userName" placeholder="Enter your name">
+<input type="text" id="userName" placeholder="Enter name">
 <input type="file" id="photoInput" accept="image/*">
 <button onclick="saveProfile()">Save Profile</button>
-
-<button onclick="unlockSound()">🔊 Enable Sound</button>
+<button onclick="unlockSound()">🔊 Enable Tick Sound</button>
 <button onclick="changeTheme()">🎨 Change Theme</button>
 
 <h2 id="monthYear"></h2>
 <h3 id="weekTitle"></h3>
 
-<!-- WEEK NAVIGATION -->
 <div style="display:flex;gap:6px">
 <button onclick="changeWeek(-1)">⬅ Prev</button>
 <button onclick="changeWeek(1)">Next ➡</button>
 </div>
 
-<!-- HABIT TABLE -->
 <div class="table-wrap card">
 <table>
 <thead>
@@ -83,74 +109,62 @@ input[type=checkbox]{transform:scale(1.2)}
 <th>Date</th><th>Day</th>
 <th>Goal</th><th>Sleep</th><th>Wake</th>
 <th>Food</th><th>Study</th><th>Run</th>
-<th>Exercise</th><th>Book</th><th>%</th>
+<th>Exercise</th><th>Book</th>
+<th>%</th>
 </tr>
 </thead>
 <tbody id="chartBody"></tbody>
 </table>
 </div>
 
-<!-- WATER -->
 <div class="card">
 <h3>💧 Water</h3>
 <input type="number" id="water" placeholder="glasses">
 <button onclick="saveWater()">Save</button>
 </div>
 
-<!-- WEIGHT -->
 <div class="card">
 <h3>⚖️ Weight</h3>
-<input type="number" step="0.1" id="weight" placeholder="KG">
+<input type="number" step="0.1" id="weight" placeholder="kg">
 <button onclick="saveWeight()">Save</button>
 </div>
 
-<!-- REMINDER -->
-<div class="card">
-<h3>🔔 Reminder</h3>
-<input type="time" id="reminderTime">
-<button onclick="setReminder()">Set Reminder</button>
 </div>
 
-</div>
-
-<!-- Sound -->
 <audio id="tickSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 
 <script>
-/* CONSTANTS */
+/* ===== CORE VARIABLES ===== */
+const habits = 8;
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const habits=8;
 let today=new Date(); today.setHours(0,0,0,0);
-let weekOffset=0;
+let weekOffset = 0;
 
-/* SOUND */
+/* ===== SOUND ===== */
 let soundReady=false;
 function unlockSound(){
   const a=document.getElementById("tickSound");
   a.play().then(()=>{
     a.pause(); a.currentTime=0;
     soundReady=true;
-    alert("Sound Enabled!");
   });
 }
 
-/* PROFILE */
+/* ===== PROFILE ===== */
 function saveProfile(){
   let n=document.getElementById("userName").value;
-  if(n){
-    localStorage.setItem("userName",n);
-  }
-  const file=document.getElementById("photoInput").files[0];
-  if(file){
-    const r=new FileReader();
+  if(n) localStorage.setItem("userName",n);
+
+  let f=document.getElementById("photoInput").files[0];
+  if(f){
+    let r=new FileReader();
     r.onload=()=>localStorage.setItem("profilePic",r.result);
-    r.readAsDataURL(file);
+    r.readAsDataURL(f);
   }
   loadProfile();
 }
-
 function loadProfile(){
   let n=localStorage.getItem("userName")||"Your Name";
   let p=localStorage.getItem("profilePic");
@@ -160,40 +174,58 @@ function loadProfile(){
   updateStreak();
 }
 
-/* HABITS TABLE */
-function changeWeek(v){weekOffset+=v;render();}
+/* ===== THEME ===== */
+let theme=Number(localStorage.getItem("theme"))||1;
+function applyTheme(){
+  document.body.className="theme-"+theme;
+}
+function changeTheme(){
+  theme++; if(theme>10) theme=1;
+  localStorage.setItem("theme",theme);
+  applyTheme();
+}
+
+/* ===== TABLE RENDER ===== */
+function changeWeek(v){weekOffset+=v; render();}
 function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
 function render(){
-  let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
-  document.getElementById("monthYear").innerText=today.toLocaleString("default",{month:"long",year:"numeric"});
-  document.getElementById("weekTitle").innerText="Week of "+start.toDateString();
-  let body=document.getElementById("chartBody"); body.innerHTML="";
+  let start = weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+  monthYear.innerText = start.toLocaleString("default",{ month:"long",year:"numeric" });
+  weekTitle.innerText = "Week of "+start.toDateString();
+
+  let tbody=document.getElementById("chartBody");
+  tbody.innerHTML="";
+
   for(let i=0;i<7;i++){
     let d=new Date(start); d.setDate(start.getDate()+i);
-    if(d.getMonth()!=today.getMonth()) continue;
+    if(Math.abs(d - today) > 40*86400000) continue; // stability
+
     let isToday=d.toDateString()===today.toDateString();
-    let row=document.createElement("tr");
-    if(isToday) row.classList.add("today");
-    let html=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
+    let tr=document.createElement("tr");
+    if(isToday) tr.classList.add("today");
+
+    let row=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
     for(let h=0;h<habits;h++){
-      let key=`${today.getFullYear()}-${today.getMonth()}_${d.getDate()}_${h}`;
-      let ch=localStorage.getItem(key)==="1";
-      html+=`<td><input type="checkbox"
-       ${ch?'checked':''}
-       onclick="saveHabit('${key}',this)"
-       ${!isToday?'disabled':''}></td>`;
+      let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
+      let ch = localStorage.getItem(key)==="1";
+      row+=`<td>
+      <input type="checkbox"
+      ${ch?'checked':''}
+      ${!isToday?'disabled':''}
+      onclick="saveHabit('${key}',this)">
+      </td>`;
     }
-    html+=`<td class="per"></td>`;
-    row.innerHTML=html;
-    body.appendChild(row);
+    row+=`<td class="per"></td>`;
+    tr.innerHTML=row;
+    tbody.appendChild(tr);
   }
   calcPercent();
 }
 
-/* HABIT SAVE */
+/* ===== HABITS SAVE ===== */
 function saveHabit(key,el){
-  localStorage.setItem(key,el.checked?'1':'0');
+  localStorage.setItem(key,el.checked?"1":"0");
   if(soundReady){
     tickSound.currentTime=0;
     tickSound.play();
@@ -201,66 +233,56 @@ function saveHabit(key,el){
   updateStreak(); calcPercent();
 }
 
-/* PERCENT CALC */
+/* ===== PERCENT ===== */
 function calcPercent(){
-  document.querySelectorAll("tbody tr").forEach(r=>{
-    let boxes=r.querySelectorAll("input");
-    let done=[...boxes].filter(b=>b.checked).length;
-    r.querySelector(".per").innerText=Math.round(done/habits*100)+"%";
+  document.querySelectorAll(".per").forEach(per=>{
+    let row=per.parentNode;
+    let done=row.querySelectorAll("input:checked").length;
+    per.innerText=Math.round(done/habits*100)+"%";
   });
 }
 
-/* STREAK FIXED */
+/* ===== STREAK (Perfect Fix) ===== */
 function updateStreak(){
   let s=0;
   let d=new Date(today);
-  while(true){
-    let k=`done_${d.toDateString()}`;
-    if(!localStorage.getItem(k)) break;
-    s++; d.setDate(d.getDate()-1);
-  }
-  let todayKey="done_"+today.toDateString();
-  if(document.querySelector(".today input:checked")) localStorage.setItem(todayKey,"yes");
 
-  localStorage.setItem("streak",s);
+  while(true){
+    let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_0`;
+    let rowHasTick=false;
+
+    for(let i=0;i<habits;i++){
+      let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
+      if(localStorage.getItem(k)==="1") rowHasTick=true;
+    }
+
+    if(!rowHasTick) break;
+    s++;
+    d.setDate(d.getDate()-1);
+  }
+
   streakShow.innerText="🔥 Streak: "+s;
+  localStorage.setItem("streak",s);
 }
 
-/* WATER / WEIGHT */
+/* ===== WATER/WEIGHT ===== */
 function saveWater(){
-  localStorage.setItem("water",document.getElementById("water").value||0);
+  localStorage.setItem("water",water.value);
   updateStats();
 }
 function saveWeight(){
-  localStorage.setItem("weight",document.getElementById("weight").value||0);
+  localStorage.setItem("weight",weight.value);
   updateStats();
 }
 function updateStats(){
-  let w=localStorage.getItem("water")||0;
-  let kg=localStorage.getItem("weight")||0;
-  statsShow.innerText=`💧${w} | ⚖️${kg}`;
+  statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
 }
 
-/* THEME */
-let theme=localStorage.getItem("theme")||1;
-document.body.className="theme-"+theme;
-function changeTheme(){
-  theme++; if(theme>10) theme=1;
-  localStorage.setItem("theme",theme);
-  document.body.className="theme-"+theme;
-}
-
-/* REMINDER */
-function setReminder(){
-  let t=document.getElementById("reminderTime").value;
-  if(!t) return;
-  localStorage.setItem("reminderTime",t);
-  Notification.requestPermission();
-  alert("Reminder saved");
-}
-
-loadProfile(); render();
+/* INIT */
+applyTheme();
+loadProfile();
+render();
 </script>
-
 </body>
 </html>
+
