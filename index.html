@@ -7,19 +7,23 @@
 
 <style>
 *{box-sizing:border-box;transition:0.25s}
-
-/* BEST FONT */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root{
-  --bg:#e8f5e9; --card:#fff;
-  --accent:#2ecc71; --hover:#27ae60; --text:#000;
+  --bg:#e8f5e9;
+  --card:#fff;
+  --accent:#2ecc71;
+  --hover:#27ae60;
+  --text:#000;
 }
 
-/* DARK MODE */
+/* 🌙 DARK MODE */
 body.dark{
-  --bg:#1c1c1e; --card:#2c2c2e;
-  --accent:#9dfc5c; --hover:#6ae645; --text:#fff;
+  --bg:#1c1c1e;
+  --card:#2c2c2e;
+  --accent:#9dfc5c;
+  --hover:#6ae645;
+  --text:#fff;
 }
 
 body{
@@ -30,7 +34,7 @@ body{
   padding:12px;
 }
 
-/* APP CONTAINER */
+/* APP */
 .app{
   max-width:500px;margin:auto;
   background:var(--card);
@@ -63,16 +67,21 @@ button:active{transform:scale(.92)}
   object-fit:cover;background:#aaa
 }
 
-/* CARDS */
+/* CARD */
 .card{
-  background:var(--card);border:2px solid var(--accent);
+  background:var(--card);
+  border:2px solid var(--accent);
   padding:12px;border-radius:14px;
   margin-top:12px;
   box-shadow:0 4px 10px rgba(0,0,0,.15)
 }
 .card-title{
-  font-weight:600;color:var(--accent);text-align:center;
-  text-transform:uppercase;font-size:14px;margin-bottom:6px;
+  font-weight:600;
+  color:var(--accent);
+  text-align:center;
+  text-transform:uppercase;
+  font-size:14px;
+  margin-bottom:6px;
 }
 
 /* TABLE */
@@ -86,18 +95,43 @@ body.dark .today{background:#4d4b2c}
 td:hover{background:#d7ffd7}
 body.dark td:hover{background:#334c2f}
 
-/* MUSIC UI */
-.music-controls{display:flex;gap:8px;justify-content:center;margin:6px 0}
-.music-controls button{
- width:auto;padding:8px 12px;font-size:18px;border-radius:50%
+/* MUSIC PLAYER */
+.music-controls{
+  display:flex;gap:8px;justify-content:center;margin:6px 0
 }
-#songName{text-align:center;font-weight:bold;color:var(--accent)}
+.music-controls button{
+  width:auto;padding:8px 12px;
+  font-size:18px;border-radius:50%
+}
+#songName{
+  text-align:center;font-weight:bold;
+  color:var(--accent);margin-bottom:6px
+}
+
+/* PLAYLIST MANAGER SCREEN */
+#playlistScreen{
+  display:none;
+  max-width:500px;
+  margin:auto;
+  background:var(--card);
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.25)
+}
+.songItem{
+  padding:10px;margin:6px 0;
+  background:#eee;border-radius:8px;
+  display:flex;justify-content:space-between;
+}
+.songItem button{
+  width:auto;padding:4px 10px;
+  background:red;color:white;border-radius:6px
+}
 </style>
 </head>
-
 <body>
+<div class="app" id="mainApp">
 
-<div class="app">
 <div id="appTitle">My Daily Fitness</div>
 
 <!-- PROFILE -->
@@ -110,21 +144,26 @@ body.dark td:hover{background:#334c2f}
 </div>
 </div>
 
-<input type="text" id="userName" placeholder="Enter name">
+<input type="text" id="userName" placeholder="Enter name..">
 <input type="file" id="photoInput" accept="image/*">
 <button onclick="saveProfile()">Save Profile</button>
 
-<!-- MUSIC -->
+<!-- MUSIC PLAYER -->
 <div class="card">
 <div class="card-title">🎧 Music Player</div>
 <div id="songName"></div>
+
 <div class="music-controls">
 <button onclick="prevSong()">⏮</button>
 <button onclick="toggleMusic()">⏯</button>
 <button onclick="nextSong()">⏭</button>
 </div>
-<input type="range" id="volumeControl" min="0" max="1" step="0.05" oninput="changeVolume(this.value)">
+
+<input type="range" id="volumeControl" min="0" max="1" step="0.05"
+oninput="changeVolume(this.value)">
 <button onclick="toggleLoop()">🔁 Loop: Off</button>
+
+<button onclick="openPlaylist()">🎵 Manage My Songs</button>
 </div>
 
 <button onclick="editHabits()">✏️ Edit Habits</button>
@@ -135,213 +174,343 @@ body.dark td:hover{background:#334c2f}
 
 <h2 id="monthYear"></h2>
 <h3 id="weekTitle"></h3>
+
 <div style="display:flex;gap:6px">
 <button onclick="changeWeek(-1)">⬅ Prev</button>
 <button onclick="changeWeek(1)">Next ➡</button>
 </div>
 
+<!-- HABIT TABLE -->
 <div class="table-wrap card">
-<table><thead><tr id="habitHeadRow"></tr></thead>
-<tbody id="chartBody"></tbody></table></div>
+<table>
+<thead><tr id="habitHeadRow"></tr></thead>
+<tbody id="chartBody"></tbody>
+</table>
+</div>
 
-<!-- WATER -->
+<!-- WATER TRACKER -->
 <div class="card">
-<div class="card-title">💧 WATER TRACKER</div>
+<div class="card-title">💧 Water</div>
 <input type="number" id="water">
 <button onclick="saveWater()">Save</button>
 </div>
 
-<!-- WEIGHT -->
+<!-- WEIGHT TRACKER -->
 <div class="card">
-<div class="card-title">⚖️ WEIGHT TRACKER</div>
+<div class="card-title">⚖️ Weight</div>
 <input type="number" step="0.1" id="weight">
 <button onclick="saveWeight()">Save</button>
 </div>
 
-<!-- ALARM BELOW WEIGHT ✔ -->
+<!-- ALARM -->
 <div class="card">
 <div class="card-title">⏰ Alarm</div>
 <input type="time" id="alarmTime">
 <button onclick="setAlarm()">Save Alarm</button>
 </div>
 
+</div> <!-- END MAIN APP -->
+
+<!-- 🎶 SONG PLAYLIST MANAGER SCREEN -->
+<div id="playlistScreen">
+<h2 style="color:var(--accent);text-align:center;">🎵 My Songs</h2>
+
+<div id="songList"></div>
+
+<input type="file" id="songUpload" accept="audio/*" style="margin-top:10px;">
+<button onclick="addCustomSong()">➕ Add New Song</button>
+
+<button onclick="closePlaylist()" style="background:gray">Back</button>
 </div>
 
+
+<!-- AUDIO -->
 <audio id="tickSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 <audio id="music"></audio>
-
 <script>
+/* GLOBALS */
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-let habits=8; let weekOffset=0;
+let habits=8;
+let weekOffset=0;
 let today=new Date(); today.setHours(0,0,0,0);
+let soundReady=false;
 
-/* MUSIC */
-let playlist=[
-{name:"🔥 Pump Up",url:"https://www.bensound.com/bensound-music/bensound-epic.mp3"},
-{name:"⚡ Beast Mode",url:"https://www.bensound.com/bensound-music/bensound-actionable.mp3"},
-{name:"🎧 Focus Boost",url:"https://www.bensound.com/bensound-music/bensound-funkyelement.mp3"},
-{name:"💥 Motivation HIT",url:"https://www.bensound.com/bensound-music/bensound-energy.mp3"}
+/* ==========================
+      DARK MODE
+========================== */
+if(localStorage.getItem("dark")==="true")
+ document.body.classList.add("dark");
+
+function toggleDark(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+
+
+/* ==========================
+     MUSIC PLAYER SYSTEM
+========================== */
+let defaultSongs=[
+ {name:"Pump Up 🔥",url:"https://www.bensound.com/bensound-music/bensound-epic.mp3"},
+ {name:"Beast Mode ⚡",url:"https://www.bensound.com/bensound-music/bensound-actionable.mp3"},
+ {name:"Focus Boost 🎧",url:"https://www.bensound.com/bensound-music/bensound-funkyelement.mp3"}
 ];
 
-let curSong=+localStorage.getItem("song")||0;
+let customSongs = JSON.parse(localStorage.getItem("customSongs")||"[]");
+let playlist = [...defaultSongs, ...customSongs];
+
+let curSong=0;
 let music=document.getElementById("music");
-music.loop=false;
-music.src=playlist[curSong].url;
-music.volume=+localStorage.getItem("vol")||0.6;
-document.getElementById("volumeControl").value=music.volume;
-songName.innerText=playlist[curSong].name;
 
-function toggleMusic(){music.paused?music.play():music.pause();}
-function prevSong(){curSong=(curSong-1+playlist.length)%playlist.length; loadSong();}
-function nextSong(){curSong=(curSong+1)%playlist.length; loadSong();}
-function changeVolume(v){music.volume=v; localStorage.setItem("vol",v);}
-function toggleLoop(){music.loop=!music.loop; event.target.innerText=`🔁 Loop: ${music.loop?"On":"Off"}`;}
 function loadSong(){
-localStorage.setItem("song",curSong);
-music.src=playlist[curSong].url;
-songName.innerText=playlist[curSong].name;
-music.play();
+  let s=playlist[curSong];
+  music.src=s.url;
+  songName.innerText=s.name;
+  localStorage.setItem("lastSongIndex",curSong);
+  music.play();
+}
+curSong=+localStorage.getItem("lastSongIndex")||0;
+loadSong();
+
+music.volume = +localStorage.getItem("vol")||0.6;
+volumeControl.value = music.volume;
+
+function toggleMusic(){music.paused ? music.play() : music.pause();}
+function nextSong(){curSong=(curSong+1)%playlist.length; loadSong();}
+function prevSong(){curSong=(curSong-1+playlist.length)%playlist.length; loadSong();}
+function changeVolume(v){music.volume=v;localStorage.setItem("vol",v);}
+function toggleLoop(){
+ music.loop=!music.loop;
+ event.target.innerText="🔁 Loop: "+(music.loop?"On":"Off");
 }
 
-/* DARK */
-if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
-function toggleDark(){
-document.body.classList.toggle("dark");
-localStorage.setItem("dark",document.body.classList.contains("dark"));
+
+/* 🆕 OPEN PLAYLIST SCREEN */
+function openPlaylist(){
+ document.getElementById("mainApp").style.display="none";
+ document.getElementById("playlistScreen").style.display="block";
+ displaySongs();
 }
 
-/* PROFILE */
+/* CLOSE PLAYLIST SCREEN */
+function closePlaylist(){
+ document.getElementById("playlistScreen").style.display="none";
+ document.getElementById("mainApp").style.display="block";
+}
+
+/* SHOW CURRENT SONGS */
+function displaySongs(){
+ let container=document.getElementById("songList");
+ container.innerHTML="";
+ playlist.forEach((s,i)=>{
+   container.innerHTML+=`
+     <div class="songItem">
+       ${s.name}
+       ${i>=defaultSongs.length ? `<button onclick="deleteSong(${i})">❌</button>`:""}
+     </div>`;
+ });
+}
+
+/* ADD CUSTOM SONG */
+function addCustomSong(){
+ let file=document.getElementById("songUpload").files[0];
+ if(!file) return;
+
+ let url=URL.createObjectURL(file);
+ customSongs.push({name:file.name,url:url});
+ localStorage.setItem("customSongs",JSON.stringify(customSongs));
+
+ playlist=[...defaultSongs,...customSongs];
+ curSong=playlist.length-1;
+ loadSong();
+ displaySongs();
+ alert("🎵 Song Added!");
+}
+
+/* DELETE CUSTOM SONG */
+function deleteSong(i){
+ customSongs.splice(i-defaultSongs.length,1);
+ localStorage.setItem("customSongs",JSON.stringify(customSongs));
+ playlist=[...defaultSongs,...customSongs];
+ displaySongs();
+ loadSong();
+}
+
+
+/* ==========================
+       PROFILE
+========================== */
 function saveProfile(){
-let n=userName.value;if(n) localStorage.setItem("name",n);
-let f=photoInput.files[0];
-if(f){
-let r=new FileReader();
-r.onload=()=>{localStorage.setItem("pic",r.result); profilePic.src=r.result;}
-r.readAsDataURL(f);
+ let n=userName.value;
+ if(n) localStorage.setItem("name",n);
+
+ let f=photoInput.files[0];
+ if(f){
+   let r=new FileReader();
+   r.onload=()=>{
+    localStorage.setItem("pic",r.result);
+    profilePic.src=r.result;
+   }
+   r.readAsDataURL(f);
+ }
+ loadProfile();
 }
-loadProfile();
-}
+
 function loadProfile(){
-userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
-profilePic.src=localStorage.getItem("pic")||"";
-updateStats(); updateStreak();
+ userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
+ profilePic.src=localStorage.getItem("pic")||"";
+ updateStats(); updateStreak();
 }
 
-/* HABIT EDIT */
+
+/* ==========================
+       HABIT EDIT
+========================== */
 function editHabits(){
-habitEditor.innerHTML="";
-let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
-for(let i=0;i<habits;i++){
-habitEditor.innerHTML+=`<input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
+ habitEditor.innerHTML="";
+ let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
+
+ for(let i=0;i<habits;i++){
+   habitEditor.innerHTML+=`
+    <input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
+ }
+
+ habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
+ habitEditor.style.display="block";
 }
-habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
-habitEditor.style.display="block";
-}
+
 function saveHabits(){
-let arr=[];
-for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
-localStorage.setItem("habitNames",JSON.stringify(arr));
-habitEditor.style.display="none";
-render();
+ let arr=[];
+ for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
+ localStorage.setItem("habitNames",JSON.stringify(arr));
+ habitEditor.style.display="none";
+ render();
 }
 
-/* SOUND */
-let soundReady=false;
+
+/* ==========================
+      TICK SOUND
+========================== */
 function unlockSound(){
-tickSound.play().then(()=>{
-tickSound.pause();tickSound.currentTime=0;soundReady=true;
-});
+ tickSound.play().then(()=>{
+  tickSound.pause(); tickSound.currentTime=0;
+  soundReady=true;
+ });
 }
 
-/* WATER & WEIGHT */
+/* ==========================
+      WATER & WEIGHT
+========================== */
 function saveWater(){localStorage.setItem("water",water.value);updateStats();}
 function saveWeight(){localStorage.setItem("weight",weight.value);updateStats();}
 function updateStats(){
-statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
+ statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
 }
 
-/* ALARM (FIXED REAL WORKING) */
+
+/* ==========================
+          ALARM
+========================== */
 function setAlarm(){
-let t=alarmTime.value;
-if(!t) return alert("Select a time!");
-localStorage.setItem("alarm",t);
-Notification.requestPermission();
-alert("Alarm Set!");
+ let t=alarmTime.value;
+ if(!t) return alert("Select a time!");
+ localStorage.setItem("alarm",t);
+ Notification.requestPermission();
+ alert("⏰ Alarm Set!");
 }
+
 setInterval(()=>{
-let t=localStorage.getItem("alarm");if(!t) return;
-let n=new Date();
-let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
-if(cur===t){alert("⏰ Wake Up!");}
+ let set=localStorage.getItem("alarm");
+ if(!set) return;
+ let n=new Date();
+ let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+ if(cur===set){ alert("⏰ Time to move!"); }
 },60000);
 
-/* STREAK */
+
+/* ==========================
+         STREAK
+========================== */
 function updateStreak(){
-let s=0; let d=new Date(today);
-while(true){
-let done=false;
-for(let i=0;i<habits;i++){
-let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
-if(localStorage.getItem(k)==="1") done=true;
-}
-if(!done) break;
-s++;d.setDate(d.getDate()-1);
-}
-streakShow.innerText="🔥 Streak: "+s;
-localStorage.setItem("streak",s);
+ let s=0;
+ let d=new Date(today);
+
+ while(true){
+  let done=false;
+  for(let i=0;i<habits;i++){
+   let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
+   if(localStorage.getItem(k)==="1") done=true;
+  }
+  if(!done) break;
+  s++; d.setDate(d.getDate()-1);
+ }
+
+ streakShow.innerText="🔥 Streak: "+s;
+ localStorage.setItem("streak",s);
 }
 
-/* WEEK UPDATE */
+
+/* ==========================
+         HABIT TABLE
+========================== */
 function changeWeek(v){weekOffset+=v;render();}
 function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
-/* TABLE */
 function render(){
-let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
-monthYear.innerText=start.toLocaleString("default",{month:"long",year:"numeric"});
-weekTitle.innerText=start.toDateString();
+ let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+ monthYear.innerText=start.toLocaleString("default",{month:"long",year:"numeric"});
+ weekTitle.innerText=start.toDateString();
 
-let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
-let row=`<th>Date</th><th>Day</th>`;
-for(let i=0;i<habits;i++) row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;
-row+=`<th>%</th>`;
-habitHeadRow.innerHTML=row;
+ let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
+ let row=`<th>Date</th><th>Day</th>`;
+ for(let i=0;i<habits;i++) row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;
+ row+=`<th>%</th>`;
+ habitHeadRow.innerHTML=row;
 
-chartBody.innerHTML="";
-for(let i=0;i<7;i++){
-let d=new Date(start); d.setDate(start.getDate()+i);
-let isToday=d.toDateString()===today.toDateString();
-let html=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
-for(let h=0;h<habits;h++){
-let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
-let ch=localStorage.getItem(key)==="1";
-html+=`<td><input type="checkbox" ${ch?'checked':''}
-${!isToday?'disabled':''} onclick="saveTick('${key}',this)"></td>`;
-}
-chartBody.innerHTML+=
-`<tr class="${isToday?'today':''}">${html}<td class="per">0%</td></tr>`;
-}
-calcPercent();
+ chartBody.innerHTML="";
+ for(let i=0;i<7;i++){
+  let d=new Date(start); d.setDate(start.getDate()+i);
+  let istoday=d.toDateString()===today.toDateString();
+  let r=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
+
+  for(let h=0;h<habits;h++){
+   let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
+   let ch=localStorage.getItem(k)==="1";
+   r+=`<td><input type="checkbox" ${ch?'checked':''}
+    ${!istoday?'disabled':''}
+    onclick="saveTick('${k}',this)">
+   </td>`;
+  }
+  chartBody.innerHTML+=`<tr class="${istoday?'today':''}">
+    ${r}<td class="per">0%</td></tr>`;
+ }
+
+ calcPercent();
 }
 
 function saveTick(k,el){
-localStorage.setItem(k,el.checked?"1":"0");
-if(soundReady){tickSound.currentTime=0; tickSound.play();}
-updateStreak(); calcPercent();
+ localStorage.setItem(k,el.checked?"1":"0");
+ if(soundReady){ tickSound.currentTime=0; tickSound.play(); }
+ updateStreak(); calcPercent();
 }
 
 function calcPercent(){
-document.querySelectorAll(".per").forEach(per=>{
-let row=per.parentNode;
-let done=row.querySelectorAll("input:checked").length;
-per.innerText=Math.round(done/habits*100)+"%";
-});
+ document.querySelectorAll(".per").forEach(per=>{
+  let row=per.parentNode;
+  let done=row.querySelectorAll("input:checked").length;
+  per.innerText=Math.round(done/habits*100)+"%";
+ });
 }
 
-/* INIT */
-loadProfile(); render();
+
+/* ==========================
+          INIT
+========================== */
+loadProfile();
+render();
+displaySongs();
 </script>
 
 </body>
