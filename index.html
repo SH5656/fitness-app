@@ -3,63 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fitness Habit App</title>
+<title>My Daily Fitness</title>
 
 <style>
 *{box-sizing:border-box;transition:0.25s}
 
+/* BEST FONT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 :root{
-  --bg:#e8f5e9; --card:#fff; --accent:#2ecc71; --hover:#27ae60; --text:#000;
+  --bg:#e8f5e9; --card:#fff;
+  --accent:#2ecc71; --hover:#27ae60; --text:#000;
 }
 
-/* 🌙 DARK MODE */
+/* DARK MODE */
 body.dark{
-  --bg:#1c1c1e; --card:#2c2c2e; --accent:#9dfc5c;
-  --hover:#6ce644; --text:#fff;
+  --bg:#1c1c1e; --card:#2c2c2e;
+  --accent:#9dfc5c; --hover:#6ae645; --text:#fff;
 }
 
 body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Segoe UI,Arial;padding:12px;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Poppins',sans-serif;
+  padding:12px;
 }
 
+/* APP CONTAINER */
 .app{
-  max-width:500px;margin:auto;background:var(--card);
+  max-width:500px;margin:auto;
+  background:var(--card);
   padding:18px;border-radius:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.25)
+}
+
+/* TITLE */
+#appTitle{
+  text-align:center;
+  font-size:26px;
+  font-weight:600;
+  color:var(--accent);
+  margin-bottom:12px;
 }
 
 /* BUTTON */
 button{
   width:100%;padding:10px;margin:6px 0;
   font-size:16px;border-radius:10px;border:none;
-  background:var(--accent);color:var(--text);
-  cursor:pointer;
+  background:var(--accent);color:var(--text);cursor:pointer;
 }
 button:hover{background:var(--hover);transform:translateY(-2px)}
 button:active{transform:scale(.92)}
 
 /* PROFILE */
-.profile{
-  display:flex;align-items:center;gap:12px;margin-bottom:10px
-}
+.profile{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .profile img{
-  width:65px;height:65px;border-radius:50%;object-fit:cover;background:#aaa;
+  width:65px;height:65px;border-radius:50%;
+  object-fit:cover;background:#aaa
 }
 
-/* CARD */
+/* CARDS */
 .card{
   background:var(--card);border:2px solid var(--accent);
   padding:12px;border-radius:14px;
-  margin-top:12px;box-shadow:0 4px 10px rgba(0,0,0,.15)
+  margin-top:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.15)
 }
 .card-title{
-  font-weight:bold;color:var(--accent);text-align:center;margin-bottom:8px;
-  font-size:15px;text-transform:uppercase;
+  font-weight:600;color:var(--accent);text-align:center;
+  text-transform:uppercase;font-size:14px;margin-bottom:6px;
 }
 
 /* TABLE */
-.table-wrap{overflow-x:auto;margin-top:10px;}
+.table-wrap{overflow-x:auto;margin-top:10px}
 table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 th,td{border:1px solid #ccc;padding:6px;text-align:center}
 th{background:#e7e7e7;color:#000}
@@ -69,26 +86,19 @@ body.dark .today{background:#4d4b2c}
 td:hover{background:#d7ffd7}
 body.dark td:hover{background:#334c2f}
 
-/* MUSIC PLAYER */
-.music-controls{
-  display:flex;gap:8px;justify-content:center;margin:6px 0;
-}
+/* MUSIC UI */
+.music-controls{display:flex;gap:8px;justify-content:center;margin:6px 0}
 .music-controls button{
-  width:auto;
-  padding:8px 14px;
-  font-size:18px;
-  border-radius:50%;
+ width:auto;padding:8px 12px;font-size:18px;border-radius:50%
 }
-#songName{
-  text-align:center;font-weight:bold;color:var(--accent);
-  margin-bottom:6px;font-size:15px;
-}
-
+#songName{text-align:center;font-weight:bold;color:var(--accent)}
 </style>
 </head>
+
 <body>
 
 <div class="app">
+<div id="appTitle">My Daily Fitness</div>
 
 <!-- PROFILE -->
 <div class="profile">
@@ -104,26 +114,24 @@ body.dark td:hover{background:#334c2f}
 <input type="file" id="photoInput" accept="image/*">
 <button onclick="saveProfile()">Save Profile</button>
 
-<button onclick="editHabits()">✏️ Edit Habits</button>
-<div id="habitEditor" class="card" style="display:none"></div>
-
-<button onclick="unlockSound()">🔊 Enable Tick Sound</button>
-<button onclick="toggleDark()">🌙 Dark Mode</button>
-
-<!-- 🎵 MUSIC PLAYER -->
+<!-- MUSIC -->
 <div class="card">
 <div class="card-title">🎧 Music Player</div>
 <div id="songName"></div>
-
 <div class="music-controls">
 <button onclick="prevSong()">⏮</button>
 <button onclick="toggleMusic()">⏯</button>
 <button onclick="nextSong()">⏭</button>
 </div>
-
 <input type="range" id="volumeControl" min="0" max="1" step="0.05" oninput="changeVolume(this.value)">
 <button onclick="toggleLoop()">🔁 Loop: Off</button>
 </div>
+
+<button onclick="editHabits()">✏️ Edit Habits</button>
+<div id="habitEditor" class="card" style="display:none"></div>
+
+<button onclick="unlockSound()">🔊 Enable Tick Sound</button>
+<button onclick="toggleDark()">🌙 Dark Mode</button>
 
 <h2 id="monthYear"></h2>
 <h3 id="weekTitle"></h3>
@@ -136,21 +144,29 @@ body.dark td:hover{background:#334c2f}
 <table><thead><tr id="habitHeadRow"></tr></thead>
 <tbody id="chartBody"></tbody></table></div>
 
+<!-- WATER -->
 <div class="card">
-<div class="card-title">💧 Water</div>
-<input type="number" id="water" placeholder="Glasses">
+<div class="card-title">💧 WATER TRACKER</div>
+<input type="number" id="water">
 <button onclick="saveWater()">Save</button>
 </div>
 
+<!-- WEIGHT -->
 <div class="card">
-<div class="card-title">⚖️ Weight</div>
+<div class="card-title">⚖️ WEIGHT TRACKER</div>
 <input type="number" step="0.1" id="weight">
 <button onclick="saveWeight()">Save</button>
 </div>
 
+<!-- ALARM BELOW WEIGHT ✔ -->
+<div class="card">
+<div class="card-title">⏰ Alarm</div>
+<input type="time" id="alarmTime">
+<button onclick="setAlarm()">Save Alarm</button>
 </div>
 
-<!-- SOUNDS -->
+</div>
+
 <audio id="tickSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
@@ -158,166 +174,176 @@ body.dark td:hover{background:#334c2f}
 
 <script>
 const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-let habits=8;
+let habits=8; let weekOffset=0;
 let today=new Date(); today.setHours(0,0,0,0);
-let weekOffset=0;
-
-/* SOUND */
-let soundReady=false;
-function unlockSound(){
-  tickSound.play().then(()=>{
-    tickSound.pause();
-    tickSound.currentTime=0;
-    soundReady=true;
-  });
-}
-
-/* DARK MODE */
-if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
-function toggleDark(){
- document.body.classList.toggle("dark");
- localStorage.setItem("dark",document.body.classList.contains("dark"));
-}
 
 /* MUSIC */
 let playlist=[
- {name:"Gym Boost",url:"https://www.bensound.com/bensound-music/bensound-epic.mp3"},
- {name:"Energy Flow",url:"https://www.bensound.com/bensound-music/bensound-actionable.mp3"},
- {name:"Focus Mode",url:"https://www.bensound.com/bensound-music/bensound-funkyelement.mp3"}
+{name:"🔥 Pump Up",url:"https://www.bensound.com/bensound-music/bensound-epic.mp3"},
+{name:"⚡ Beast Mode",url:"https://www.bensound.com/bensound-music/bensound-actionable.mp3"},
+{name:"🎧 Focus Boost",url:"https://www.bensound.com/bensound-music/bensound-funkyelement.mp3"},
+{name:"💥 Motivation HIT",url:"https://www.bensound.com/bensound-music/bensound-energy.mp3"}
 ];
 
 let curSong=+localStorage.getItem("song")||0;
 let music=document.getElementById("music");
-music.src=playlist[curSong].url;
 music.loop=false;
+music.src=playlist[curSong].url;
 music.volume=+localStorage.getItem("vol")||0.6;
-
 document.getElementById("volumeControl").value=music.volume;
 songName.innerText=playlist[curSong].name;
 
-function toggleMusic(){ music.paused ? music.play() : music.pause(); }
-function prevSong(){ curSong=(curSong-1+playlist.length)%playlist.length; loadSong();}
-function nextSong(){ curSong=(curSong+1)%playlist.length; loadSong();}
-function changeVolume(v){ music.volume=v; localStorage.setItem("vol",v);}
-function toggleLoop(){
- music.loop=!music.loop;
- event.target.innerHTML="🔁 Loop: "+(music.loop?"On":"Off");
-}
+function toggleMusic(){music.paused?music.play():music.pause();}
+function prevSong(){curSong=(curSong-1+playlist.length)%playlist.length; loadSong();}
+function nextSong(){curSong=(curSong+1)%playlist.length; loadSong();}
+function changeVolume(v){music.volume=v; localStorage.setItem("vol",v);}
+function toggleLoop(){music.loop=!music.loop; event.target.innerText=`🔁 Loop: ${music.loop?"On":"Off"}`;}
 function loadSong(){
- localStorage.setItem("song",curSong);
- music.src=playlist[curSong].url;
- songName.innerText=playlist[curSong].name;
- music.play();
+localStorage.setItem("song",curSong);
+music.src=playlist[curSong].url;
+songName.innerText=playlist[curSong].name;
+music.play();
+}
+
+/* DARK */
+if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
+function toggleDark(){
+document.body.classList.toggle("dark");
+localStorage.setItem("dark",document.body.classList.contains("dark"));
 }
 
 /* PROFILE */
 function saveProfile(){
- let n=userName.value; if(n) localStorage.setItem("name",n);
- let f=photoInput.files[0];
- if(f){
-   let r=new FileReader();
-   r.onload=()=>{localStorage.setItem("pic",r.result); profilePic.src=r.result;}
-   r.readAsDataURL(f);
- }
- loadProfile();
+let n=userName.value;if(n) localStorage.setItem("name",n);
+let f=photoInput.files[0];
+if(f){
+let r=new FileReader();
+r.onload=()=>{localStorage.setItem("pic",r.result); profilePic.src=r.result;}
+r.readAsDataURL(f);
+}
+loadProfile();
 }
 function loadProfile(){
- userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
- profilePic.src=localStorage.getItem("pic")||"";
- updateStats(); updateStreak();
+userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
+profilePic.src=localStorage.getItem("pic")||"";
+updateStats(); updateStreak();
 }
 
 /* HABIT EDIT */
 function editHabits(){
- habitEditor.innerHTML="";
- let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
- for(let i=0;i<habits;i++){
-   habitEditor.innerHTML+=`<input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
- }
- habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
- habitEditor.style.display="block";
+habitEditor.innerHTML="";
+let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
+for(let i=0;i<habits;i++){
+habitEditor.innerHTML+=`<input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
+}
+habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
+habitEditor.style.display="block";
 }
 function saveHabits(){
- let arr=[];
- for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
- localStorage.setItem("habitNames",JSON.stringify(arr));
- habitEditor.style.display="none";
- render();
+let arr=[];
+for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
+localStorage.setItem("habitNames",JSON.stringify(arr));
+habitEditor.style.display="none";
+render();
 }
 
-/* WATER + WEIGHT */
+/* SOUND */
+let soundReady=false;
+function unlockSound(){
+tickSound.play().then(()=>{
+tickSound.pause();tickSound.currentTime=0;soundReady=true;
+});
+}
+
+/* WATER & WEIGHT */
 function saveWater(){localStorage.setItem("water",water.value);updateStats();}
 function saveWeight(){localStorage.setItem("weight",weight.value);updateStats();}
 function updateStats(){
- statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
+statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
 }
+
+/* ALARM (FIXED REAL WORKING) */
+function setAlarm(){
+let t=alarmTime.value;
+if(!t) return alert("Select a time!");
+localStorage.setItem("alarm",t);
+Notification.requestPermission();
+alert("Alarm Set!");
+}
+setInterval(()=>{
+let t=localStorage.getItem("alarm");if(!t) return;
+let n=new Date();
+let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+if(cur===t){alert("⏰ Wake Up!");}
+},60000);
 
 /* STREAK */
 function updateStreak(){
- let s=0;
- let d=new Date(today);
- while(true){
-   let done=false;
-   for(let i=0;i<habits;i++){
-     let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
-     if(localStorage.getItem(k)==="1") done=true;
-   }
-   if(!done) break;
-   s++; d.setDate(d.getDate()-1);
- }
- streakShow.innerText="🔥 Streak: "+s;
- localStorage.setItem("streak",s);
+let s=0; let d=new Date(today);
+while(true){
+let done=false;
+for(let i=0;i<habits;i++){
+let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
+if(localStorage.getItem(k)==="1") done=true;
+}
+if(!done) break;
+s++;d.setDate(d.getDate()-1);
+}
+streakShow.innerText="🔥 Streak: "+s;
+localStorage.setItem("streak",s);
 }
 
-/* WEEK CHANGE */
+/* WEEK UPDATE */
 function changeWeek(v){weekOffset+=v;render();}
 function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
+/* TABLE */
 function render(){
- let start = weekStart(new Date(today.getTime()+weekOffset*7*86400000));
- monthYear.innerText=start.toLocaleString("default",{month:"long",year:"numeric"});
- weekTitle.innerText=start.toDateString();
+let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
+monthYear.innerText=start.toLocaleString("default",{month:"long",year:"numeric"});
+weekTitle.innerText=start.toDateString();
 
- let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
- let row=`<th>Date</th><th>Day</th>`;
- for(let i=0;i<habits;i++){row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;}
- row+=`<th>%</th>`;
- habitHeadRow.innerHTML=row;
+let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
+let row=`<th>Date</th><th>Day</th>`;
+for(let i=0;i<habits;i++) row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;
+row+=`<th>%</th>`;
+habitHeadRow.innerHTML=row;
 
- chartBody.innerHTML="";
- for(let i=0;i<7;i++){
-   let d=new Date(start); d.setDate(start.getDate()+i);
-   let isToday=d.toDateString()===today.toDateString();
-   let r=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
-   for(let h=0;h<habits;h++){
-     let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
-     let ch=localStorage.getItem(k)==="1";
-     r+=`<td>
-      <input type="checkbox" ${ch?'checked':''}
-      ${!isToday?'disabled':''}
-      onclick="saveTick('${k}',this)">
-     </td>`;
-   }
-   chartBody.innerHTML+=`<tr class="${isToday?'today':''}">${r}<td class="per">0%</td></tr>`;
- }
-
- calcPercent();
+chartBody.innerHTML="";
+for(let i=0;i<7;i++){
+let d=new Date(start); d.setDate(start.getDate()+i);
+let isToday=d.toDateString()===today.toDateString();
+let html=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
+for(let h=0;h<habits;h++){
+let key=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
+let ch=localStorage.getItem(key)==="1";
+html+=`<td><input type="checkbox" ${ch?'checked':''}
+${!isToday?'disabled':''} onclick="saveTick('${key}',this)"></td>`;
 }
+chartBody.innerHTML+=
+`<tr class="${isToday?'today':''}">${html}<td class="per">0%</td></tr>`;
+}
+calcPercent();
+}
+
 function saveTick(k,el){
- localStorage.setItem(k,el.checked?"1":"0");
- if(soundReady){tickSound.currentTime=0; tickSound.play();}
- updateStreak(); calcPercent();
+localStorage.setItem(k,el.checked?"1":"0");
+if(soundReady){tickSound.currentTime=0; tickSound.play();}
+updateStreak(); calcPercent();
 }
+
 function calcPercent(){
- document.querySelectorAll(".per").forEach(per=>{
-   let row=per.parentNode;
-   let done=row.querySelectorAll("input:checked").length;
-   per.innerText=Math.round(done/habits*100)+"%";
- });
+document.querySelectorAll(".per").forEach(per=>{
+let row=per.parentNode;
+let done=row.querySelectorAll("input:checked").length;
+per.innerText=Math.round(done/habits*100)+"%";
+});
 }
 
 /* INIT */
 loadProfile(); render();
 </script>
+
 </body>
 </html>
+
