@@ -127,10 +127,19 @@ body.dark td:hover{background:#334c2f}
   width:auto;padding:4px 10px;
   background:red;color:white;border-radius:6px
 }
+#timerScreen button{
+width:auto;padding:10px 18px;margin:6px;
+border-radius:10px;border:none;font-size:16px;
+background:#4da6ff;color:#000;cursor:pointer;
+}
+#timerScreen button:hover{background:#62b4ff}
+#timerScreen button:active{transform:scale(.92)}
+
 </style>
 </head>
 <body>
 <div class="app" id="mainApp">
+<button onclick="openTimer()">🏋️ Start Workout Timer</button>
 
 <div id="appTitle">My Daily Fitness</div>
 
@@ -222,6 +231,164 @@ oninput="changeVolume(this.value)">
 
 <button onclick="closePlaylist()" style="background:gray">Back</button>
 </div>
+<!-- WORKOUT TIMER FULLSCREEN -->
+<div id="timerScreen" 
+style="display:none;width:100%;height:100vh;
+background:#001f3f;color:white;
+position:fixed;top:0;left:0;z-index:9999;
+padding:20px;text-align:center">
+
+<h2 style="color:#4da6ff;font-size:24px;">Workout Timer</h2>
+
+<!-- Circular Progress Ring -->
+<canvas id="circleCanvas" width="250" height="250"
+style="margin-top:20px;"></canvas>
+
+<h1 id="timerDisplay" style="font-size:48px;margin:10px 0;">
+00:00
+</h1>
+
+<div>
+<button onclick="setTime(30)">30s</button>
+<button onclick="setTime(60)">1m</button>
+<button onclick="setTime(120)">2m</button>
+</div>
+
+<input type="number" id="customTime" placeholder="Custom sec"
+style="margin-top:10px;width:120px;text-align:center;border:none;
+border-radius:8px;padding:6px;">
+
+<div style="margin-top:15px;">
+<button onclick="startTimerFS()">Start</button>
+<button onclick="pauseTimerFS()" style="background:#888">Pause</button>
+<button onclick="resetTimerFS()" style="background:#f74a4a;color:white">
+Reset</button>
+</div>
+
+<button onclick="closeTimer()" 
+style="margin-top:20px;width:70%;background:#005bbb;">
+⬅ Back
+</button>
+
+</div>
+<script>
+// ===== WORKOUT TIMER FULLSCREEN =====
+let timerSec = 0;
+let remaining = 0;
+let timerInterval;
+let isRunning = false;
+
+// Screen & Canvas
+const timerScreen = document.getElementById("timerScreen");
+const timerDisplay = document.getElementById("timerDisplay");
+const canvas = document.getElementById("circleCanvas");
+const ctx = canvas.getContext("2d");
+let radius = canvas.width / 2 - 10;
+
+// Open & Close
+function openTimer(){
+  timerScreen.style.display = "block";
+  document.body.style.overflow = "hidden";
+}
+function closeTimer(){
+  resetTimerFS();
+  timerScreen.style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
+// Set Time (Presets)
+function setTime(sec){
+  timerSec = sec;
+  remaining = sec;
+  updateTimerUI();
+  drawCircle(1);
+}
+
+// Draw Circular Progress
+function drawCircle(progress){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Background circle
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2*Math.PI);
+  ctx.strokeStyle = "#003366";
+  ctx.lineWidth = 12;
+  ctx.stroke();
+  
+  // Progress arc
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, canvas.height/2, radius,
+          -Math.PI/2,
+          (2 * Math.PI * progress) - Math.PI/2);
+  ctx.strokeStyle = "#4da6ff";
+  ctx.lineWidth = 12;
+  ctx.stroke();
+}
+
+// Update UI Time text
+function updateTimerUI(){
+  let m = Math.floor(remaining / 60);
+  let s = remaining % 60;
+  timerDisplay.innerText = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  drawCircle(remaining / timerSec);
+}
+
+updateTimerUI();
+
+// Start Timer
+function startTimerFS(){
+  if(isRunning) return;
+  
+  if(timerSec === 0){
+    let custom = +document.getElementById("customTime").value;
+    if(!custom) return alert("Enter time first!");
+    setTime(custom);
+  }
+  
+  isRunning = true;
+  timerInterval = setInterval(()=>{
+    remaining--;
+    updateTimerUI();
+    
+    if(remaining <= 0){
+      completeTimer();
+    }
+  }, 1000);
+}
+
+// Pause Timer
+function pauseTimerFS(){
+  isRunning = false;
+  clearInterval(timerInterval);
+}
+
+// Reset Timer
+function resetTimerFS(){
+  isRunning = false;
+  clearInterval(timerInterval);
+  remaining = timerSec;
+  updateTimerUI();
+}
+
+// When timer ends
+function completeTimer(){
+  clearInterval(timerInterval);
+  isRunning = false;
+  remaining = 0;
+  updateTimerUI();
+  
+  // VIBRATION
+  if(navigator.vibrate){
+    navigator.vibrate([500,200,500]);
+  }
+
+  // SOUND ALERT
+  let beep = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-classic-alarm-995.mp3");
+  beep.play();
+
+  alert("🔥 Workout Round Completed!");
+}
+</script>
 
 
 <!-- AUDIO -->
