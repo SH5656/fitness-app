@@ -5,145 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Daily Fitness</title>
 
-<style>
-*{box-sizing:border-box;transition:0.25s}
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+<link rel="stylesheet" href="style.css">
 
-:root{
-  --bg:#e8f5e9;
-  --card:#fff;
-  --accent:#2ecc71;
-  --hover:#27ae60;
-  --text:#000;
-}
-
-/* 🌙 DARK MODE */
-body.dark{
-  --bg:#1c1c1e;
-  --card:#2c2c2e;
-  --accent:#9dfc5c;
-  --hover:#6ae645;
-  --text:#fff;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Poppins',sans-serif;
-  padding:12px;
-}
-
-/* APP */
-.app{
-  max-width:500px;margin:auto;
-  background:var(--card);
-  padding:18px;border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.25)
-}
-
-/* TITLE */
-#appTitle{
-  text-align:center;
-  font-size:26px;
-  font-weight:600;
-  color:var(--accent);
-  margin-bottom:12px;
-}
-
-/* BUTTON */
-button{
-  width:100%;padding:10px;margin:6px 0;
-  font-size:16px;border-radius:10px;border:none;
-  background:var(--accent);color:var(--text);cursor:pointer;
-}
-button:hover{background:var(--hover);transform:translateY(-2px)}
-button:active{transform:scale(.92)}
-
-/* PROFILE */
-.profile{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.profile img{
-  width:65px;height:65px;border-radius:50%;
-  object-fit:cover;background:#aaa
-}
-
-/* CARD */
-.card{
-  background:var(--card);
-  border:2px solid var(--accent);
-  padding:12px;border-radius:14px;
-  margin-top:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.15)
-}
-.card-title{
-  font-weight:600;
-  color:var(--accent);
-  text-align:center;
-  text-transform:uppercase;
-  font-size:14px;
-  margin-bottom:6px;
-}
-
-/* TABLE */
-.table-wrap{overflow-x:auto;margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
-th,td{border:1px solid #ccc;padding:6px;text-align:center}
-th{background:#e7e7e7;color:#000}
-body.dark th{background:#444;color:#fff}
-.today{background:#fff4a8}
-body.dark .today{background:#4d4b2c}
-td:hover{background:#d7ffd7}
-body.dark td:hover{background:#334c2f}
-
-/* MUSIC PLAYER */
-.music-controls{
-  display:flex;gap:8px;justify-content:center;margin:6px 0
-}
-.music-controls button{
-  width:auto;padding:8px 12px;
-  font-size:18px;border-radius:50%
-}
-#songName{
-  text-align:center;font-weight:bold;
-  color:var(--accent);margin-bottom:6px
-}
-
-/* PLAYLIST MANAGER SCREEN */
-#playlistScreen{
-  display:none;
-  max-width:500px;
-  margin:auto;
-  background:var(--card);
-  padding:18px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.25)
-}
-.songItem{
-  padding:10px;margin:6px 0;
-  background:#eee;border-radius:8px;
-  display:flex;justify-content:space-between;
-}
-.songItem button{
-  width:auto;padding:4px 10px;
-  background:red;color:white;border-radius:6px
-}
-#timerScreen button{
-width:auto;padding:10px 18px;margin:6px;
-border-radius:10px;border:none;font-size:16px;
-background:#4da6ff;color:#000;cursor:pointer;
-}
-#timerScreen button:hover{background:#62b4ff}
-#timerScreen button:active{transform:scale(.92)}
-
-</style>
 </head>
 <body>
+
 <div class="app" id="mainApp">
 <button onclick="openTimer()">🏋️ Start Workout Timer</button>
 
 <div id="appTitle">My Daily Fitness</div>
 
-<!-- PROFILE -->
 <div class="profile">
 <img id="profilePic">
 <div>
@@ -157,27 +28,22 @@ background:#4da6ff;color:#000;cursor:pointer;
 <input type="file" id="photoInput" accept="image/*">
 <button onclick="saveProfile()">Save Profile</button>
 
-<!-- MUSIC PLAYER -->
 <div class="card">
 <div class="card-title">🎧 Music Player</div>
 <div id="songName"></div>
-
 <div class="music-controls">
 <button onclick="prevSong()">⏮</button>
 <button onclick="toggleMusic()">⏯</button>
 <button onclick="nextSong()">⏭</button>
 </div>
-
 <input type="range" id="volumeControl" min="0" max="1" step="0.05"
 oninput="changeVolume(this.value)">
 <button onclick="toggleLoop()">🔁 Loop: Off</button>
-
 <button onclick="openPlaylist()">🎵 Manage My Songs</button>
 </div>
 
 <button onclick="editHabits()">✏️ Edit Habits</button>
 <div id="habitEditor" class="card" style="display:none"></div>
-
 <button onclick="unlockSound()">🔊 Enable Tick Sound</button>
 <button onclick="toggleDark()">🌙 Dark Mode</button>
 
@@ -189,7 +55,6 @@ oninput="changeVolume(this.value)">
 <button onclick="changeWeek(1)">Next ➡</button>
 </div>
 
-<!-- HABIT TABLE -->
 <div class="table-wrap card">
 <table>
 <thead><tr id="habitHeadRow"></tr></thead>
@@ -197,489 +62,58 @@ oninput="changeVolume(this.value)">
 </table>
 </div>
 
-<!-- WATER TRACKER -->
 <div class="card">
 <div class="card-title">💧 Water</div>
 <input type="number" id="water">
 <button onclick="saveWater()">Save</button>
 </div>
 
-<!-- WEIGHT TRACKER -->
 <div class="card">
 <div class="card-title">⚖️ Weight</div>
 <input type="number" step="0.1" id="weight">
 <button onclick="saveWeight()">Save</button>
 </div>
 
-<!-- ALARM -->
 <div class="card">
 <div class="card-title">⏰ Alarm</div>
 <input type="time" id="alarmTime">
 <button onclick="setAlarm()">Save Alarm</button>
 </div>
 
-</div> <!-- END MAIN APP -->
+</div>
 
-<!-- 🎶 SONG PLAYLIST MANAGER SCREEN -->
 <div id="playlistScreen">
 <h2 style="color:var(--accent);text-align:center;">🎵 My Songs</h2>
-
 <div id="songList"></div>
-
 <input type="file" id="songUpload" accept="audio/*" style="margin-top:10px;">
 <button onclick="addCustomSong()">➕ Add New Song</button>
-
 <button onclick="closePlaylist()" style="background:gray">Back</button>
 </div>
-<!-- WORKOUT TIMER FULLSCREEN -->
-<div id="timerScreen" 
-style="display:none;width:100%;height:100vh;
-background:#001f3f;color:white;
-position:fixed;top:0;left:0;z-index:9999;
-padding:20px;text-align:center">
 
-<h2 style="color:#4da6ff;font-size:24px;">Workout Timer</h2>
-
-<!-- Circular Progress Ring -->
-<canvas id="circleCanvas" width="250" height="250"
-style="margin-top:20px;"></canvas>
-
-<h1 id="timerDisplay" style="font-size:48px;margin:10px 0;">
-00:00
-</h1>
-
+<div id="timerScreen">
+<h2>Workout Timer</h2>
+<canvas id="circleCanvas" width="250" height="250"></canvas>
+<h1 id="timerDisplay">00:00</h1>
 <div>
 <button onclick="setTime(30)">30s</button>
 <button onclick="setTime(60)">1m</button>
 <button onclick="setTime(120)">2m</button>
 </div>
-
-<input type="number" id="customTime" placeholder="Custom sec"
-style="margin-top:10px;width:120px;text-align:center;border:none;
-border-radius:8px;padding:6px;">
-
-<div style="margin-top:15px;">
+<input type="number" id="customTime" placeholder="Custom seconds">
+<div>
 <button onclick="startTimerFS()">Start</button>
-<button onclick="pauseTimerFS()" style="background:#888">Pause</button>
-<button onclick="resetTimerFS()" style="background:#f74a4a;color:white">
-Reset</button>
+<button onclick="pauseTimerFS()" class="pause">Pause</button>
+<button onclick="resetTimerFS()" class="reset">Reset</button>
+</div>
+<button onclick="closeTimer()" class="back">⬅ Back</button>
 </div>
 
-<button onclick="closeTimer()" 
-style="margin-top:20px;width:70%;background:#005bbb;">
-⬅ Back
-</button>
-
-</div>
-<script>
-// ===== WORKOUT TIMER FULLSCREEN =====
-let timerSec = 0;
-let remaining = 0;
-let timerInterval;
-let isRunning = false;
-
-// Screen & Canvas
-const timerScreen = document.getElementById("timerScreen");
-const timerDisplay = document.getElementById("timerDisplay");
-const canvas = document.getElementById("circleCanvas");
-const ctx = canvas.getContext("2d");
-let radius = canvas.width / 2 - 10;
-
-// Open & Close
-function openTimer(){
-  timerScreen.style.display = "block";
-  document.body.style.overflow = "hidden";
-}
-function closeTimer(){
-  resetTimerFS();
-  timerScreen.style.display = "none";
-  document.body.style.overflow = "auto";
-}
-
-// Set Time (Presets)
-function setTime(sec){
-  timerSec = sec;
-  remaining = sec;
-  updateTimerUI();
-  drawCircle(1);
-}
-
-// Draw Circular Progress
-function drawCircle(progress){
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Background circle
-  ctx.beginPath();
-  ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2*Math.PI);
-  ctx.strokeStyle = "#003366";
-  ctx.lineWidth = 12;
-  ctx.stroke();
-  
-  // Progress arc
-  ctx.beginPath();
-  ctx.arc(canvas.width/2, canvas.height/2, radius,
-          -Math.PI/2,
-          (2 * Math.PI * progress) - Math.PI/2);
-  ctx.strokeStyle = "#4da6ff";
-  ctx.lineWidth = 12;
-  ctx.stroke();
-}
-
-// Update UI Time text
-function updateTimerUI(){
-  let m = Math.floor(remaining / 60);
-  let s = remaining % 60;
-  timerDisplay.innerText = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-  drawCircle(remaining / timerSec);
-}
-
-updateTimerUI();
-
-// Start Timer
-function startTimerFS(){
-  if(isRunning) return;
-  
-  if(timerSec === 0){
-    let custom = +document.getElementById("customTime").value;
-    if(!custom) return alert("Enter time first!");
-    setTime(custom);
-  }
-  
-  isRunning = true;
-  timerInterval = setInterval(()=>{
-    remaining--;
-    updateTimerUI();
-    
-    if(remaining <= 0){
-      completeTimer();
-    }
-  }, 1000);
-}
-
-// Pause Timer
-function pauseTimerFS(){
-  isRunning = false;
-  clearInterval(timerInterval);
-}
-
-// Reset Timer
-function resetTimerFS(){
-  isRunning = false;
-  clearInterval(timerInterval);
-  remaining = timerSec;
-  updateTimerUI();
-}
-
-// When timer ends
-function completeTimer(){
-  clearInterval(timerInterval);
-  isRunning = false;
-  remaining = 0;
-  updateTimerUI();
-  
-  // VIBRATION
-  if(navigator.vibrate){
-    navigator.vibrate([500,200,500]);
-  }
-
-  // SOUND ALERT
-  let beep = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-classic-alarm-995.mp3");
-  beep.play();
-
-  alert("🔥 Workout Round Completed!");
-}
-</script>
-
-
-<!-- AUDIO -->
 <audio id="tickSound" preload="auto">
 <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
 </audio>
 <audio id="music"></audio>
-<script>
-/* GLOBALS */
-const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-let habits=8;
-let weekOffset=0;
-let today=new Date(); today.setHours(0,0,0,0);
-let soundReady=false;
 
-/* ==========================
-      DARK MODE
-========================== */
-if(localStorage.getItem("dark")==="true")
- document.body.classList.add("dark");
-
-function toggleDark(){
- document.body.classList.toggle("dark");
- localStorage.setItem("dark",document.body.classList.contains("dark"));
-}
-
-
-/* ==========================
-     MUSIC PLAYER SYSTEM
-========================== */
-let defaultSongs=[
- {name:"Pump Up 🔥",url:"https://www.bensound.com/bensound-music/bensound-epic.mp3"},
- {name:"Beast Mode ⚡",url:"https://www.bensound.com/bensound-music/bensound-actionable.mp3"},
- {name:"Focus Boost 🎧",url:"https://www.bensound.com/bensound-music/bensound-funkyelement.mp3"}
-];
-
-let customSongs = JSON.parse(localStorage.getItem("customSongs")||"[]");
-let playlist = [...defaultSongs, ...customSongs];
-
-let curSong=0;
-let music=document.getElementById("music");
-
-function loadSong(){
-  let s=playlist[curSong];
-  music.src=s.url;
-  songName.innerText=s.name;
-  localStorage.setItem("lastSongIndex",curSong);
-  music.play();
-}
-curSong=+localStorage.getItem("lastSongIndex")||0;
-loadSong();
-
-music.volume = +localStorage.getItem("vol")||0.6;
-volumeControl.value = music.volume;
-
-function toggleMusic(){music.paused ? music.play() : music.pause();}
-function nextSong(){curSong=(curSong+1)%playlist.length; loadSong();}
-function prevSong(){curSong=(curSong-1+playlist.length)%playlist.length; loadSong();}
-function changeVolume(v){music.volume=v;localStorage.setItem("vol",v);}
-function toggleLoop(){
- music.loop=!music.loop;
- event.target.innerText="🔁 Loop: "+(music.loop?"On":"Off");
-}
-
-
-/* 🆕 OPEN PLAYLIST SCREEN */
-function openPlaylist(){
- document.getElementById("mainApp").style.display="none";
- document.getElementById("playlistScreen").style.display="block";
- displaySongs();
-}
-
-/* CLOSE PLAYLIST SCREEN */
-function closePlaylist(){
- document.getElementById("playlistScreen").style.display="none";
- document.getElementById("mainApp").style.display="block";
-}
-
-/* SHOW CURRENT SONGS */
-function displaySongs(){
- let container=document.getElementById("songList");
- container.innerHTML="";
- playlist.forEach((s,i)=>{
-   container.innerHTML+=`
-     <div class="songItem">
-       ${s.name}
-       ${i>=defaultSongs.length ? `<button onclick="deleteSong(${i})">❌</button>`:""}
-     </div>`;
- });
-}
-
-/* ADD CUSTOM SONG */
-function addCustomSong(){
- let file=document.getElementById("songUpload").files[0];
- if(!file) return;
-
- let url=URL.createObjectURL(file);
- customSongs.push({name:file.name,url:url});
- localStorage.setItem("customSongs",JSON.stringify(customSongs));
-
- playlist=[...defaultSongs,...customSongs];
- curSong=playlist.length-1;
- loadSong();
- displaySongs();
- alert("🎵 Song Added!");
-}
-
-/* DELETE CUSTOM SONG */
-function deleteSong(i){
- customSongs.splice(i-defaultSongs.length,1);
- localStorage.setItem("customSongs",JSON.stringify(customSongs));
- playlist=[...defaultSongs,...customSongs];
- displaySongs();
- loadSong();
-}
-
-
-/* ==========================
-       PROFILE
-========================== */
-function saveProfile(){
- let n=userName.value;
- if(n) localStorage.setItem("name",n);
-
- let f=photoInput.files[0];
- if(f){
-   let r=new FileReader();
-   r.onload=()=>{
-    localStorage.setItem("pic",r.result);
-    profilePic.src=r.result;
-   }
-   r.readAsDataURL(f);
- }
- loadProfile();
-}
-
-function loadProfile(){
- userNameShow.innerText="👤 "+(localStorage.getItem("name")||"Your Name");
- profilePic.src=localStorage.getItem("pic")||"";
- updateStats(); updateStreak();
-}
-
-
-/* ==========================
-       HABIT EDIT
-========================== */
-function editHabits(){
- habitEditor.innerHTML="";
- let saved=JSON.parse(localStorage.getItem("habitNames")||"[]");
-
- for(let i=0;i<habits;i++){
-   habitEditor.innerHTML+=`
-    <input id="h${i}" value="${saved[i]||"Habit "+(i+1)}">`;
- }
-
- habitEditor.innerHTML+=`<button onclick="saveHabits()">Save</button>`;
- habitEditor.style.display="block";
-}
-
-function saveHabits(){
- let arr=[];
- for(let i=0;i<habits;i++) arr.push(document.getElementById("h"+i).value);
- localStorage.setItem("habitNames",JSON.stringify(arr));
- habitEditor.style.display="none";
- render();
-}
-
-
-/* ==========================
-      TICK SOUND
-========================== */
-function unlockSound(){
- tickSound.play().then(()=>{
-  tickSound.pause(); tickSound.currentTime=0;
-  soundReady=true;
- });
-}
-
-/* ==========================
-      WATER & WEIGHT
-========================== */
-function saveWater(){localStorage.setItem("water",water.value);updateStats();}
-function saveWeight(){localStorage.setItem("weight",weight.value);updateStats();}
-function updateStats(){
- statsShow.innerText=`💧${localStorage.getItem("water")||0} | ⚖️${localStorage.getItem("weight")||0}`;
-}
-
-
-/* ==========================
-          ALARM
-========================== */
-function setAlarm(){
- let t=alarmTime.value;
- if(!t) return alert("Select a time!");
- localStorage.setItem("alarm",t);
- Notification.requestPermission();
- alert("⏰ Alarm Set!");
-}
-
-setInterval(()=>{
- let set=localStorage.getItem("alarm");
- if(!set) return;
- let n=new Date();
- let cur=n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
- if(cur===set){ alert("⏰ Time to move!"); }
-},60000);
-
-
-/* ==========================
-         STREAK
-========================== */
-function updateStreak(){
- let s=0;
- let d=new Date(today);
-
- while(true){
-  let done=false;
-  for(let i=0;i<habits;i++){
-   let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${i}`;
-   if(localStorage.getItem(k)==="1") done=true;
-  }
-  if(!done) break;
-  s++; d.setDate(d.getDate()-1);
- }
-
- streakShow.innerText="🔥 Streak: "+s;
- localStorage.setItem("streak",s);
-}
-
-
-/* ==========================
-         HABIT TABLE
-========================== */
-function changeWeek(v){weekOffset+=v;render();}
-function weekStart(d){let x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
-
-function render(){
- let start=weekStart(new Date(today.getTime()+weekOffset*7*86400000));
- monthYear.innerText=start.toLocaleString("default",{month:"long",year:"numeric"});
- weekTitle.innerText=start.toDateString();
-
- let names=JSON.parse(localStorage.getItem("habitNames")||"[]");
- let row=`<th>Date</th><th>Day</th>`;
- for(let i=0;i<habits;i++) row+=`<th>${names[i]||"Habit "+(i+1)}</th>`;
- row+=`<th>%</th>`;
- habitHeadRow.innerHTML=row;
-
- chartBody.innerHTML="";
- for(let i=0;i<7;i++){
-  let d=new Date(start); d.setDate(start.getDate()+i);
-  let istoday=d.toDateString()===today.toDateString();
-  let r=`<td>${d.getDate()}</td><td>${days[d.getDay()]}</td>`;
-
-  for(let h=0;h<habits;h++){
-   let k=`${d.getFullYear()}-${d.getMonth()}_${d.getDate()}_${h}`;
-   let ch=localStorage.getItem(k)==="1";
-   r+=`<td><input type="checkbox" ${ch?'checked':''}
-    ${!istoday?'disabled':''}
-    onclick="saveTick('${k}',this)">
-   </td>`;
-  }
-  chartBody.innerHTML+=`<tr class="${istoday?'today':''}">
-    ${r}<td class="per">0%</td></tr>`;
- }
-
- calcPercent();
-}
-
-function saveTick(k,el){
- localStorage.setItem(k,el.checked?"1":"0");
- if(soundReady){ tickSound.currentTime=0; tickSound.play(); }
- updateStreak(); calcPercent();
-}
-
-function calcPercent(){
- document.querySelectorAll(".per").forEach(per=>{
-  let row=per.parentNode;
-  let done=row.querySelectorAll("input:checked").length;
-  per.innerText=Math.round(done/habits*100)+"%";
- });
-}
-
-
-/* ==========================
-          INIT
-========================== */
-loadProfile();
-render();
-displaySongs();
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
-
