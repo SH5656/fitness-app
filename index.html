@@ -1,119 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Daily Fitness</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Daily Fitness</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-<div class="app" id="mainApp">
-<button onclick="openTimer()">🏋️ Start Workout Timer</button>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>💪 My Daily <span class="highlight">Fitness</span></h1>
+                <p>Track your journey to greatness</p>
+            </div>
+            <div class="login-form">
+                <input type="email" id="loginEmail" placeholder="Email Address" class="login-input">
+                <input type="text" id="loginName" placeholder="Your Name" class="login-input">
+                <button class="login-btn" onclick="handleLogin()">Get Started</button>
+            </div>
+            <div class="login-footer">
+                <p>Your data is stored locally on your device</p>
+            </div>
+        </div>
+    </div>
 
-<div id="appTitle">My Daily Fitness</div>
+    <!-- MAIN APP -->
+    <div class="app-container" id="mainApp" style="display:none;">
 
-<div class="profile">
-<img id="profilePic">
-<div>
-  <div id="userNameShow">👤 Your Name</div>
-  <div id="streakShow">🔥 Streak: 0</div>
-  <div id="statsShow">💧0 | ⚖️0</div>
-</div>
-</div>
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="logo">💪 My Daily <span class="highlight">Fitness</span></div>
+            <div class="header-right">
+                <button class="theme-selector-btn" onclick="openThemeSelector()" title="Change Theme">
+                    <span class="material-icons-round">palette</span>
+                </button>
+                <div class="user-chip" onclick="navigateTo('profile')">
+                    <img id="headerProfilePic" src="" alt="Profile">
+                </div>
+            </div>
+        </header>
 
-<input type="text" id="userName" placeholder="Enter name..">
-<input type="file" id="photoInput" accept="image/*">
-<button onclick="saveProfile()">Save Profile</button>
+        <!-- CONTENT AREA -->
+        <main id="contentArea">
 
-<div class="card">
-<div class="card-title">🎧 Music Player</div>
-<div id="songName"></div>
-<div class="music-controls">
-<button onclick="prevSong()">⏮</button>
-<button onclick="toggleMusic()">⏯</button>
-<button onclick="nextSong()">⏭</button>
-</div>
-<input type="range" id="volumeControl" min="0" max="1" step="0.05"
-oninput="changeVolume(this.value)">
-<button onclick="toggleLoop()">🔁 Loop: Off</button>
-<button onclick="openPlaylist()">🎵 Manage My Songs</button>
-</div>
+            <!-- === HOME VIEW === -->
+            <section id="view-home" class="page active">
+                <div class="date-display">
+                    <div class="current-date">
+                        <span class="day-name" id="currentDayName">Thursday</span>
+                        <span class="date-number" id="currentDate">2</span>
+                        <span class="month-year" id="currentMonthYear">January 2026</span>
+                    </div>
+                </div>
 
-<button onclick="editHabits()">✏️ Edit Habits</button>
-<div id="habitEditor" class="card" style="display:none"></div>
-<button onclick="unlockSound()">🔊 Enable Tick Sound</button>
-<button onclick="toggleDark()">🌙 Dark Mode</button>
+                <!-- Motivational Quote -->
+                <div class="quote-card">
+                    <span class="material-icons-round quote-icon">format_quote</span>
+                    <p id="motivationalQuote">Loading...</p>
+                </div>
 
-<h2 id="monthYear"></h2>
-<h3 id="weekTitle"></h3>
+                <div class="welcome-banner">
+                    <h1 id="welcomeMsg">Welcome back!</h1>
+                    <div class="header-actions">
+                        <div class="streak-badge">🔥 <span id="homeStreak">0</span> Day Streak</div>
+                        <button id="enableTrackingBtn" class="tracking-btn" onclick="requestTrackingPermission()"
+                            title="Toggle Auto Tracking">
+                            <span class="material-icons-round">sensors</span>
+                        </button>
+                    </div>
+                </div>
 
-<div style="display:flex;gap:6px">
-<button onclick="changeWeek(-1)">⬅ Prev</button>
-<button onclick="changeWeek(1)">Next ➡</button>
-</div>
+                <div class="stats-grid">
+                    <div class="stat-card water">
+                        <span class="material-icons-round">water_drop</span>
+                        <div class="stat-info">
+                            <h3>Water</h3>
+                            <p id="homeWater">0L</p>
+                        </div>
+                        <button class="mini-btn" onclick="quickAddWater()">+</button>
+                    </div>
+                    <div class="stat-card steps">
+                        <span class="material-icons-round">directions_walk</span>
+                        <div class="stat-info">
+                            <h3>Steps</h3>
+                            <p id="homeSteps">0</p>
+                        </div>
+                        <button class="mini-btn" onclick="quickAddSteps()">+</button>
+                    </div>
+                    <div class="stat-card calories">
+                        <span class="material-icons-round">local_fire_department</span>
+                        <div class="stat-info">
+                            <h3>Calories</h3>
+                            <p id="homeCalories">0 kcal</p>
+                        </div>
+                        <button class="mini-btn" onclick="quickAddCalories()">+</button>
+                    </div>
+                    <div class="stat-card weight">
+                        <span class="material-icons-round">monitor_weight</span>
+                        <div class="stat-info">
+                            <h3>Weight</h3>
+                            <p id="homeWeight">0kg</p>
+                        </div>
+                        <button class="mini-btn" onclick="navigateTo('profile')">✎</button>
+                    </div>
+                </div>
 
-<div class="table-wrap card">
-<table>
-<thead><tr id="habitHeadRow"></tr></thead>
-<tbody id="chartBody"></tbody>
-</table>
-</div>
+                <div class="card todays-habits-card">
+                    <div class="card-header">
+                        <h2>Today's Habits</h2>
+                        <button class="icon-edit-btn" onclick="editHabits()" title="Edit Habit Names">
+                            <span class="material-icons-round">edit</span>
+                        </button>
+                    </div>
+                    <div id="homeHabitList" class="habits-grid">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
 
-<div class="card">
-<div class="card-title">💧 Water</div>
-<input type="number" id="water">
-<button onclick="saveWater()">Save</button>
-</div>
+                <!-- Achievement Badges -->
+                <div class="card achievements-card">
+                    <h2>🏆 Achievements</h2>
+                    <div id="achievementsList" class="achievements-grid">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </section>
 
-<div class="card">
-<div class="card-title">⚖️ Weight</div>
-<input type="number" step="0.1" id="weight">
-<button onclick="saveWeight()">Save</button>
-</div>
+            <!-- === HABITS VIEW === -->
+            <section id="view-habits" class="page">
+                <h2>Habit Tracker</h2>
 
-<div class="card">
-<div class="card-title">⏰ Alarm</div>
-<input type="time" id="alarmTime">
-<button onclick="setAlarm()">Save Alarm</button>
-</div>
+                <div class="week-controls">
+                    <button class="icon-btn" onclick="changeWeek(-1)">navigate_before</button>
+                    <div class="week-label">
+                        <h3 id="monthYear"></h3>
+                        <span id="weekTitle" class="subtitle"></span>
+                    </div>
+                    <button class="icon-btn" onclick="changeWeek(1)">navigate_next</button>
+                </div>
 
-</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr id="habitHeadRow"></tr>
+                        </thead>
+                        <tbody id="chartBody"></tbody>
+                    </table>
+                </div>
 
-<div id="playlistScreen">
-<h2 style="color:var(--accent);text-align:center;">🎵 My Songs</h2>
-<div id="songList"></div>
-<input type="file" id="songUpload" accept="audio/*" style="margin-top:10px;">
-<button onclick="addCustomSong()">➕ Add New Song</button>
-<button onclick="closePlaylist()" style="background:gray">Back</button>
-</div>
+                <button class="floating-action-btn" onclick="editHabits()">
+                    <span class="material-icons-round">edit</span>
+                </button>
+            </section>
 
-<div id="timerScreen">
-<h2>Workout Timer</h2>
-<canvas id="circleCanvas" width="250" height="250"></canvas>
-<h1 id="timerDisplay">00:00</h1>
-<div>
-<button onclick="setTime(30)">30s</button>
-<button onclick="setTime(60)">1m</button>
-<button onclick="setTime(120)">2m</button>
-</div>
-<input type="number" id="customTime" placeholder="Custom seconds">
-<div>
-<button onclick="startTimerFS()">Start</button>
-<button onclick="pauseTimerFS()" class="pause">Pause</button>
-<button onclick="resetTimerFS()" class="reset">Reset</button>
-</div>
-<button onclick="closeTimer()" class="back">⬅ Back</button>
-</div>
+            <!-- === ANALYTICS VIEW === -->
+            <section id="view-analytics" class="page">
+                <h2>📊 Weekly Analytics</h2>
 
-<audio id="tickSound" preload="auto">
-<source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
-</audio>
-<audio id="music"></audio>
+                <div class="card stats-summary">
+                    <h3>This Week's Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-value" id="weekCompletion">0%</span>
+                            <span class="summary-label">Completion</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="bestDay">-</span>
+                            <span class="summary-label">Best Day</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value" id="totalChecks">0</span>
+                            <span class="summary-label">Total Checks</span>
+                        </div>
+                    </div>
+                </div>
 
-<script src="script.js"></script>
+                <div class="card chart-card">
+                    <h3>Daily Progress</h3>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
 
+                <div class="card insights-card">
+                    <h3>💡 Insights</h3>
+                    <div id="insightsList">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- === TIMER VIEW === -->
+            <section id="view-timer" class="page">
+                <h2>Workout Timer</h2>
+                <div class="timer-circle-container">
+                    <canvas id="circleCanvas" width="280" height="280"></canvas>
+                    <div class="timer-overlay">
+                        <h1 id="timerDisplay">00:00</h1>
+                        <p id="timerState">Ready</p>
+                    </div>
+                </div>
+
+                <div class="timer-controls">
+                    <button class="control-btn play" onclick="startTimerFS()"><span
+                            class="material-icons-round">play_arrow</span></button>
+                    <button class="control-btn pause" onclick="pauseTimerFS()"><span
+                            class="material-icons-round">pause</span></button>
+                    <button class="control-btn reset" onclick="resetTimerFS()"><span
+                            class="material-icons-round">replay</span></button>
+                </div>
+
+                <div class="presets">
+                    <button class="preset-btn" onclick="setTime(30)">30s</button>
+                    <button class="preset-btn" onclick="setTime(60)">1m</button>
+                    <button class="preset-btn" onclick="setTime(120)">2m</button>
+                    <div class="custom-input">
+                        <input type="number" id="customTime" placeholder="Custom (s)">
+                    </div>
+                </div>
+            </section>
+
+            <!-- === MUSIC VIEW === -->
+            <section id="view-music" class="page">
+                <h2>Music Player</h2>
+                <div class="music-player-card">
+                    <div class="album-art">
+                        <span class="material-icons-round">music_note</span>
+                    </div>
+                    <h3 id="songName" class="scrolling-text">Select a Song</h3>
+
+                    <div class="music-controls-lg">
+                        <button class="ctrl-btn" onclick="prevSong()">skip_previous</button>
+                        <button class="ctrl-btn main-play" onclick="toggleMusic()">play_circle</button>
+                        <button class="ctrl-btn" onclick="nextSong()">skip_next</button>
+                    </div>
+
+                    <div class="volume-slider">
+                        <span class="material-icons-round">volume_down</span>
+                        <input type="range" id="volumeControl" min="0" max="1" step="0.05"
+                            oninput="changeVolume(this.value)">
+                        <span class="material-icons-round">volume_up</span>
+                    </div>
+
+                    <div class="playlist-section">
+                        <div class="section-header">
+                            <h4>Playlist</h4>
+                            <label for="songUpload" class="icon-label"><span
+                                    class="material-icons-round">add</span></label>
+                            <input type="file" id="songUpload" accept="audio/*" hidden onchange="addCustomSong()">
+                        </div>
+                        <div id="songList" class="song-list"></div>
+                    </div>
+                </div>
+                <audio id="music"></audio>
+            </section>
+
+            <!-- === PROFILE VIEW === -->
+            <section id="view-profile" class="page">
+                <h2>My Profile</h2>
+                <div class="profile-header-card">
+                    <div class="profile-img-wrapper">
+                        <img id="profilePicEdit" src="" alt="Profile">
+                        <label for="photoInput" class="edit-icon"><span
+                                class="material-icons-round">camera_alt</span></label>
+                        <input type="file" id="photoInput" accept="image/*" hidden onchange="previewProfileImage()">
+                    </div>
+                    <input type="text" id="userNameInput" placeholder="Your Name" class="transparent-input">
+                    <p class="user-email" id="userEmailDisplay"></p>
+                </div>
+
+                <!-- Profile Stats -->
+                <div class="profile-stats-grid">
+                    <div class="profile-stat">
+                        <span class="stat-number" id="profileTotalDays">0</span>
+                        <span class="stat-label">Days Active</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="stat-number" id="profileTotalHabits">0</span>
+                        <span class="stat-label">Habits Completed</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="stat-number" id="profileBestStreak">0</span>
+                        <span class="stat-label">Best Streak</span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <label>💧 Daily Water Goal (L)</label>
+                        <input type="number" id="waterInput" placeholder="2.5">
+                    </div>
+                    <div class="setting-item">
+                        <label>⚖️ Current Weight (kg)</label>
+                        <input type="number" step="0.1" id="weightInput" placeholder="70.5">
+                    </div>
+                    <div class="setting-item">
+                        <label>🎯 Weekly Goal (%)</label>
+                        <input type="number" id="goalInput" placeholder="80" value="80">
+                    </div>
+                    <div class="setting-item">
+                        <label>⏰ Daily Alarm</label>
+                        <input type="time" id="alarmTime">
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick="saveProfileData()">Save Changes</button>
+
+                <div class="extra-settings">
+                    <button class="outline-btn" onclick="openThemeSelector()">🎨 Change Theme</button>
+                    <button class="outline-btn" onclick="editHabits()">✏️ Edit Habit Names</button>
+                    <button class="outline-btn" onclick="exportData()">📥 Export Data</button>
+                    <button class="outline-btn danger" onclick="logout()">🚪 Logout</button>
+                </div>
+            </section>
+
+            <!-- HABIT EDITOR MODAL -->
+            <div id="habitEditorModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Habit Names</h3>
+                    <div id="habitEditorList"></div>
+                    <div class="modal-actions">
+                        <button onclick="closeHabitEditor()">Cancel</button>
+                        <button onclick="saveHabitNames()">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THEME SELECTOR MODAL -->
+            <div id="themeSelectorModal" class="modal">
+                <div class="modal-content theme-modal">
+                    <h3>Choose Your Theme</h3>
+                    <div class="theme-options">
+                        <div class="theme-option" onclick="selectTheme('dark')">
+                            <div class="theme-preview dark-preview">
+                                <div class="preview-header"></div>
+                                <div class="preview-content"></div>
+                            </div>
+                            <p>Dark Mode</p>
+                            <span class="theme-check" id="check-dark">✓</span>
+                        </div>
+                        <div class="theme-option" onclick="selectTheme('light')">
+                            <div class="theme-preview light-preview">
+                                <div class="preview-header"></div>
+                                <div class="preview-content"></div>
+                            </div>
+                            <p>Light Mode</p>
+                            <span class="theme-check" id="check-light">✓</span>
+                        </div>
+                        <div class="theme-option" onclick="selectTheme('orange')">
+                            <div class="theme-preview orange-preview">
+                                <div class="preview-header"></div>
+                                <div class="preview-content"></div>
+                            </div>
+                            <p>Orange Sunset</p>
+                            <span class="theme-check" id="check-orange">✓</span>
+                        </div>
+                    </div>
+                    <button class="close-modal-btn" onclick="closeThemeSelector()">Close</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="navigateTo('home')" data-target="home">
+                <span class="material-icons-round">home</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('habits')" data-target="habits">
+                <span class="material-icons-round">grid_on</span>
+                <span>Habits</span>
+            </button>
+            <button class="nav-item fab-holder" onclick="navigateTo('analytics')" data-target="analytics">
+                <div class="fab"><span class="material-icons-round">analytics</span></div>
+            </button>
+            <button class="nav-item" onclick="navigateTo('timer')" data-target="timer">
+                <span class="material-icons-round">timer</span>
+                <span>Timer</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('profile')" data-target="profile">
+                <span class="material-icons-round">person</span>
+                <span>Profile</span>
+            </button>
+        </nav>
+
+        <!-- Audio Elements -->
+        <audio id="tickSound" preload="auto">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-click-1124.mp3">
+        </audio>
+
+    </div>
+
+    <script src="script.js"></script>
 </body>
+
 </html>
