@@ -2,7 +2,7 @@
      GLOBAL CONFIG & STATE
 ======================*/
 const CONFIG = {
-    habitsCount: 8,
+    habitsCount: parseInt(localStorage.getItem('habitsCount') || 8),
     defaults: {
         songs: [
             { name: "Pump Up 🔥", url: "https://www.bensound.com/bensound-music/bensound-epic.mp3" },
@@ -10,6 +10,14 @@ const CONFIG = {
             { name: "Focus Boost 🎧", url: "https://www.bensound.com/bensound-music/bensound-funkyelement.mp3" }
         ]
     },
+    tips: [
+        "Drink water first thing in the morning to kickstart your metabolism 💧",
+        "A 10-minute walk after meals can significantly improve digestion 🚶",
+        "Consistency beats intensity every time. Keep going! 🔥",
+        "Proper sleep is as important as your workout for recovery 😴",
+        "Focus on your form before increasing weights/speed 💪",
+        "Don't forget to stretch! It keeps your muscles flexible and healthy 🧘"
+    ],
     quotes: [
         "The only bad workout is the one that didn't happen.",
         "Success is the sum of small efforts repeated day in and day out.",
@@ -131,6 +139,41 @@ function navigateTo(viewId) {
     if (viewId === 'habits') renderHabitTable();
     if (viewId === 'analytics') loadAnalytics();
     if (viewId === 'profile') loadProfileView();
+    if (viewId === 'music') syncMusicUI();
+}
+
+function syncMusicUI() {
+    if (!musicState.audio) return;
+
+    // Update Play/Pause Button
+    const playBtn = document.querySelector('.main-play');
+    if (playBtn) {
+        playBtn.innerHTML = `<span class="material-icons-round">${musicState.audio.paused ? 'play_circle' : 'pause_circle'}</span>`;
+    }
+
+    // Update Song Title
+    const title = document.getElementById('songName');
+    if (title && musicState.playlist[musicState.currentIdx]) {
+        title.innerText = musicState.playlist[musicState.currentIdx].name;
+    }
+
+    renderPlaylist();
+}
+
+function updateHeaderProgress() {
+    const ring = document.getElementById('headerProgressRing');
+    if (!ring) return;
+
+    let completed = 0;
+    const dateKey = getDayKey(state.today);
+    for (let i = 0; i < CONFIG.habitsCount; i++) {
+        if (DB.get(`${dateKey}_${i}`) === "1") completed++;
+    }
+
+    const pct = completed / CONFIG.habitsCount;
+    const circumference = 113; // 2 * PI * 18
+    const offset = circumference - (pct * circumference);
+    ring.style.strokeDashoffset = offset;
 }
 
 /* ======================
@@ -138,11 +181,14 @@ function navigateTo(viewId) {
 ======================*/
 function loadHomeData() {
     const user = DB.getJson('user') || state.user;
+    const dateKey = getDayKey(state.today);
+
     document.getElementById('welcomeMsg').innerText = `Welcome back, ${user.name.split(' ')[0]}!`;
-    document.getElementById('homeWater').innerText = (DB.get('water') || 0) + 'L';
-    document.getElementById('homeSteps').innerText = (DB.get('steps') || 0);
-    document.getElementById('homeCalories').innerText = (DB.get('calories') || 0) + ' kcal';
+    document.getElementById('homeWater').innerText = (DB.get(`water_${dateKey}`) || 0) + 'L';
+    document.getElementById('homeSteps').innerText = (DB.get(`steps_${dateKey}`) || 0);
+    document.getElementById('homeCalories').innerText = (DB.get(`calories_${dateKey}`) || 0) + ' kcal';
     document.getElementById('homeWeight').innerText = (DB.get('weight') || 0) + 'kg';
+    document.getElementById('homeSleep').innerText = (DB.get(`sleep_${dateKey}`) || 0) + 'h';
     document.getElementById('homeStreak').innerText = DB.get('streak') || 0;
 
     const picUrl = user.pic || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
@@ -152,6 +198,9 @@ function loadHomeData() {
     updateMotivationalQuote();
     renderHomeHabits();
     updateAchievements();
+    renderDailySummary();
+    checkWeeklyRecap();
+    updateHeaderProgress();
 }
 
 function updateCurrentDate() {
@@ -181,11 +230,12 @@ function renderHomeHabits() {
         const hName = habitNames[i] || `Habit ${i + 1}`;
         const key = `${dateKey}_${i}`;
         const isDone = DB.get(key) === "1";
+        const isToday = dateKey === getDayKey(state.today);
 
         html += `
       <div class="habit-item ${isDone ? 'completed' : ''}">
-        <label class="habit-checkbox">
-          <input type="checkbox" ${isDone ? 'checked' : ''} onclick="toggleHabit('${key}', this)">
+        <label class="habit-checkbox" style="${!isToday ? 'opacity: 0.6; cursor: not-allowed;' : ''}">
+          <input type="checkbox" ${isDone ? 'checked' : ''} ${!isToday ? 'disabled' : ''} onclick="toggleHabit('${key}', this)">
           <span class="checkmark"></span>
           <span class="habit-name">${hName}</span>
         </label>
@@ -196,45 +246,21 @@ function renderHomeHabits() {
 }
 
 function quickAddWater() {
-    let current = parseFloat(DB.get('water') || 0);
+    const dateKey = getDayKey(state.today);
+    let current = parseFloat(DB.get(`water_${dateKey}`) || 0);
     current = (current + 0.25).toFixed(2);
-    DB.set('water', current);
-    loadHomeData();
-}
-
-function quickAddSteps() {
-    let val = prompt("Enter steps to add (e.g. 1000) or total steps count:", "");
-    if (val === null) return;
-
-    let current = parseInt(DB.get('steps') || 0);
-    let newVal = parseInt(val);
-
-    if (isNaN(newVal)) return alert("Please enter a valid number");
-
-    // If user enters a very large number, assume it's total, otherwise increment
-    if (newVal > 100) {
-        if (confirm(`Do you want to ET total steps to ${newVal}? (If no, we will ADD ${newVal} to your current ${current})`)) {
-            DB.set('steps', newVal);
-        } else {
-            DB.set('steps', current + newVal);
-        }
-    } else {
-        DB.set('steps', current + newVal);
-    }
+    DB.set(`water_${dateKey}`, current);
     loadHomeData();
 }
 
 function quickAddCalories() {
-    let val = prompt("Enter calories burned (kcal) to add:", "100");
-    if (val === null) return;
+    // Manually adding calories is disabled to ensure automatic tracking via steps.
+    showSuccessMessage('💡 Calories are tracked automatically while walking!');
+}
 
-    let current = parseInt(DB.get('calories') || 0);
-    let newVal = parseInt(val);
-
-    if (isNaN(newVal)) return alert("Please enter a valid number");
-
-    DB.set('calories', current + newVal);
-    loadHomeData();
+function quickAddSteps() {
+    // Manually adding steps is disabled to ensure automatic sensor-based tracking.
+    showSuccessMessage('💡 Steps are tracked automatically with your movement!');
 }
 
 /* ======================
@@ -349,7 +375,7 @@ function renderHabitTable() {
             if (done) checkCount++;
 
             rowHtml += `<td>
-          <input type="checkbox" ${done ? 'checked' : ''} ${!isToday && d > state.today ? 'disabled' : ''} 
+          <input type="checkbox" ${done ? 'checked' : ''} ${!isToday ? 'disabled' : ''} 
           onclick="toggleHabit('${key}', this)">
         </td>`;
         }
@@ -369,6 +395,14 @@ function getDayKey(date) {
 }
 
 function toggleHabit(key, el) {
+    // Only allow toggling if it's the current date
+    const dateKey = key.split('_')[0];
+    if (dateKey !== getDayKey(state.today)) {
+        el.checked = !el.checked; // Revert checkbox
+        showSuccessMessage('📅 You can only track habits for today!');
+        return;
+    }
+
     DB.set(key, el.checked ? "1" : "0");
     if (el.checked) playTick();
     updateStreak();
@@ -376,6 +410,8 @@ function toggleHabit(key, el) {
     if (document.getElementById('view-home').classList.contains('active')) {
         renderHomeHabits();
         updateAchievements();
+        renderDailySummary();
+        updateHeaderProgress();
     }
 }
 
@@ -633,6 +669,26 @@ function resetTimerFS() {
     updateTimerDisplay();
 }
 
+// [New Sleep Logic]
+function quickEditSleep() {
+    const todayKey = `sleep_${getDayKey(state.today)}`;
+    const current = DB.get(todayKey) || "0";
+
+    // Simple prompt for now (can be upgraded to modal later)
+    let val = prompt("Enter hours slept (e.g. 7.5):", current);
+    if (val === null) return;
+
+    val = parseFloat(val);
+    if (isNaN(val) || val < 0) val = 0;
+    if (val > 24) val = 24;
+
+    DB.set(todayKey, val.toFixed(1));
+    document.getElementById('homeSleep').innerText = val + "h";
+    showSuccessMessage(`😴 Sleep recorded: ${val} hours`);
+    updateAchievements(); // Sleep might trigger achievements later
+    renderDailySummary();
+}
+
 /* ======================
       MUSIC PLAYER
 ======================*/
@@ -669,28 +725,32 @@ function loadSong(idx) {
 
 function toggleMusic() {
     if (!musicState.audio) return;
+    const icon = document.querySelector('.main-play span');
+
     if (musicState.audio.paused) {
         musicState.audio.play();
-        document.querySelector('.main-play').innerText = 'pause_circle';
+        if (icon) icon.innerText = 'pause_circle';
     } else {
         musicState.audio.pause();
-        document.querySelector('.main-play').innerText = 'play_circle';
+        if (icon) icon.innerText = 'play_circle';
     }
 }
 
 function nextSong() {
     loadSong(musicState.currentIdx + 1);
+    const icon = document.querySelector('.main-play span');
     if (musicState.audio) {
         musicState.audio.play();
-        document.querySelector('.main-play').innerText = 'pause_circle';
+        if (icon) icon.innerText = 'pause_circle';
     }
 }
 
 function prevSong() {
     loadSong(musicState.currentIdx - 1);
+    const icon = document.querySelector('.main-play span');
     if (musicState.audio) {
         musicState.audio.play();
-        document.querySelector('.main-play').innerText = 'pause_circle';
+        if (icon) icon.innerText = 'pause_circle';
     }
 }
 
@@ -715,9 +775,10 @@ function renderPlaylist() {
 
 function playSpecific(i) {
     loadSong(i);
+    const icon = document.querySelector('.main-play span');
     if (musicState.audio) {
         musicState.audio.play();
-        document.querySelector('.main-play').innerText = 'pause_circle';
+        if (icon) icon.innerText = 'pause_circle';
     }
 }
 
@@ -754,6 +815,7 @@ function loadProfileView() {
     document.getElementById('goalInput').value = user.goal || 80;
     document.getElementById('profilePicEdit').src = user.pic || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
     document.getElementById('alarmTime').value = DB.get('alarm') || "";
+    document.getElementById('habitCountInput').value = CONFIG.habitsCount;
 
     // Calculate profile stats
     const joinDate = user.joinDate ? new Date(user.joinDate) : state.today;
@@ -808,6 +870,11 @@ function saveProfileData() {
     DB.set('water', document.getElementById('waterInput').value);
     DB.set('weight', document.getElementById('weightInput').value);
     DB.set('alarm', document.getElementById('alarmTime').value);
+
+    // Save Habit Count
+    const newHabitCount = parseInt(document.getElementById('habitCountInput').value) || 8;
+    DB.set('habitsCount', newHabitCount);
+    CONFIG.habitsCount = newHabitCount;
 
     // Update header immediately
     if (user.pic) {
@@ -909,6 +976,15 @@ function initializeApp() {
     updateTimerDisplay();
     updateStreak();
 
+    // Position navigation indicator
+    setTimeout(() => {
+        const homeBtn = document.querySelector('.nav-item[data-target="home"]');
+        if (homeBtn) updateNavIndicator(homeBtn);
+    }, 100);
+
+    // Start tracking automatically
+    requestTrackingPermission();
+
     const user = DB.getJson('user');
     const defaultPic = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
     if (user && user.pic) {
@@ -986,14 +1062,12 @@ function showSuccessMessage(message) {
      MOTION TRACKING
 ======================*/
 async function requestTrackingPermission() {
-    if (state.trackingActive) {
-        stopStepCounter();
-        return;
-    }
+    // If already active, don't request again
+    if (state.trackingActive) return;
 
     // Check if DeviceMotionEvent is available
     if (typeof DeviceMotionEvent === 'undefined') {
-        alert('Step tracking is not supported on this device/browser.');
+        console.log('Step tracking not supported');
         return;
     }
 
@@ -1003,43 +1077,52 @@ async function requestTrackingPermission() {
             const permissionState = await DeviceMotionEvent.requestPermission();
             if (permissionState === 'granted') {
                 startStepCounter();
-            } else {
-                alert('Permission denied for motion sensors.');
             }
         } catch (error) {
-            console.error(error);
-            alert('Error requesting sensor permission.');
+            console.error('Error requesting sensor permission:', error);
         }
     } else {
-        // Non-iOS devices usually don't need explicit requestPermission
+        // Non-iOS devices
         startStepCounter();
     }
+
+    // Request Notification permission
+    if ('Notification' in window) {
+        if (Notification.permission !== 'granted') {
+            await Notification.requestPermission().catch(e => console.error('Notification permission error:', e));
+        }
+    }
+}
+
+// Global click handler to activate tracking on first interaction (required for iOS)
+document.addEventListener('click', () => {
+    if (!state.trackingActive) {
+        requestTrackingPermission();
+    }
+}, { once: false }); // We try on every click until granted
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('SW registered: ', registration);
+        }).catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+        });
+    });
 }
 
 function startStepCounter() {
+    if (state.trackingActive) return;
     state.trackingActive = true;
+    DB.set('trackingActive', 'true');
     window.addEventListener('devicemotion', handleMotion);
-    updateTrackingUI(true);
-    showSuccessMessage('🚀 Step counting activated!');
+
+    // Trigger initial notification
+    updateBackgroundNotification();
 }
 
-function stopStepCounter() {
-    state.trackingActive = false;
-    window.removeEventListener('devicemotion', handleMotion);
-    updateTrackingUI(false);
-    showSuccessMessage('⏹️ Step counting stopped.');
-}
-
-function updateTrackingUI(active) {
-    const btn = document.getElementById('enableTrackingBtn');
-    if (!btn) return;
-
-    if (active) {
-        btn.classList.add('active');
-    } else {
-        btn.classList.remove('active');
-    }
-}
+// stopStepCounter removed as tracking is now permanent
 
 function handleMotion(event) {
     const acc = event.accelerationIncludingGravity;
@@ -1057,22 +1140,190 @@ function handleMotion(event) {
 }
 
 function incrementSteps(count) {
-    let steps = parseInt(DB.get('steps') || 0);
+    const dateKey = getDayKey(state.today);
+
+    let steps = parseInt(DB.get(`steps_${dateKey}`) || 0);
     steps += count;
-    DB.set('steps', steps);
+    DB.set(`steps_${dateKey}`, steps);
 
     // Calculate calories: ~0.04 kcal per step
-    let calories = parseFloat(DB.get('calories') || 0);
+    let calories = parseFloat(DB.get(`calories_${dateKey}`) || 0);
     calories += count * 0.04;
-    DB.set('calories', Math.round(calories));
+    DB.set(`calories_${dateKey}`, Math.round(calories));
 
     // Update UI if home view is active
     if (document.getElementById('view-home').classList.contains('active')) {
         document.getElementById('homeSteps').innerText = steps;
         document.getElementById('homeCalories').innerText = Math.round(calories) + ' kcal';
     }
+
+    // Update notification via Service Worker
+    updateBackgroundNotification();
 }
 
-window.onload = function () {
-    checkLogin();
-};
+function updateBackgroundNotification() {
+    const steps = DB.get('steps') || 0;
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'UPDATE_STEPS',
+            steps: steps
+        });
+    } else if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then(registration => {
+            if (registration.active) {
+                registration.active.postMessage({
+                    type: 'UPDATE_STEPS',
+                    steps: steps
+                });
+            }
+        });
+    }
+}
+
+
+function renderDailySummary() {
+    const list = document.getElementById('dailySummaryList');
+    if (!list) return;
+
+    let completed = 0;
+    const dateKey = getDayKey(state.today);
+    for (let i = 0; i < CONFIG.habitsCount; i++) {
+        if (DB.get(`${dateKey}_${i}`) === "1") completed++;
+    }
+
+    const pct = Math.round((completed / CONFIG.habitsCount) * 100);
+    const tip = CONFIG.tips[Math.floor(Math.random() * CONFIG.tips.length)];
+
+    let statusMsg = "Let's get started!";
+    if (pct >= 100) statusMsg = "Perfect day! 🌟";
+    else if (pct >= 50) statusMsg = "Over halfway there! Keep it up! 💪";
+    else if (pct > 0) statusMsg = "Good start, keep going! 🚀";
+
+    list.innerHTML = `
+        <div class="summary-progress-card">
+            <div class="summary-header">
+                <h4>Today's Progress</h4>
+                <span class="pct-badge">${pct}%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: ${pct}%"></div>
+            </div>
+            <p class="status-msg">${statusMsg}</p>
+        </div>
+        <div class="insight-tip-card">
+            <span class="material-icons-round tip-icon">lightbulb</span>
+            <div class="tip-content">
+                <h5>Daily Health Insight</h5>
+                <p>${tip}</p>
+            </div>
+        </div>
+    `;
+}
+function checkWeeklyRecap() {
+    const user = DB.getJson('user');
+    if (!user) return;
+
+    const lastRecapStr = DB.get('lastWeeklyRecap');
+    let lastRecap = lastRecapStr ? parseInt(lastRecapStr) : null;
+
+    if (!lastRecap && user.joinDate) {
+        lastRecap = new Date(user.joinDate).getTime();
+    }
+
+    if (!lastRecap) lastRecap = Date.now();
+    const now = Date.now();
+    const diff = now - lastRecap;
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+
+    if (diff >= sevenDaysMs) {
+        showWeeklyRecap();
+    }
+}
+
+function showWeeklyRecap() {
+    const modal = document.getElementById('weeklyRecapModal');
+    const statsList = document.getElementById('recapStatsList');
+    const highlights = document.getElementById('recapHighlights');
+    const dateRange = document.getElementById('recapDateRange');
+
+    if (!modal || !statsList || !highlights) return;
+
+    let totalSteps = 0;
+    let totalWater = 0;
+    let totalCalories = 0;
+    let totalHabits = 0;
+    let activeDays = 0;
+
+    const today = new Date();
+    const end = new Date(today);
+    const start = new Date(today);
+    start.setDate(today.getDate() - 6);
+
+    dateRange.innerText = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const key = getDayKey(d);
+
+        const s = parseInt(DB.get(`steps_${key}`) || 0);
+        const w = parseFloat(DB.get(`water_${key}`) || 0);
+        const c = parseInt(DB.get(`calories_${key}`) || 0);
+
+        totalSteps += s;
+        totalWater += w;
+        totalCalories += c;
+
+        let dayHabits = 0;
+        for (let j = 0; j < CONFIG.habitsCount; j++) {
+            if (DB.get(`${key}_${j}`) === "1") dayHabits++;
+        }
+        totalHabits += dayHabits;
+        if (s > 0 || w > 0 || dayHabits > 0) activeDays++;
+    }
+
+    statsList.innerHTML = `
+        <div class="recap-stat-item">
+            <span class="material-icons-round">directions_walk</span>
+            <div class="recap-stat-info">
+                <h5>${totalSteps.toLocaleString()}</h5>
+                <p>Total Steps</p>
+            </div>
+        </div>
+        <div class="recap-stat-item">
+            <span class="material-icons-round">water_drop</span>
+            <div class="recap-stat-info">
+                <h5>${totalWater.toFixed(1)}L</h5>
+                <p>Total Water</p>
+            </div>
+        </div>
+        <div class="recap-stat-item">
+            <span class="material-icons-round">local_fire_department</span>
+            <div class="recap-stat-info">
+                <h5>${totalCalories.toLocaleString()}</h5>
+                <p>Calories Burned</p>
+            </div>
+        </div>
+        <div class="recap-stat-item">
+            <span class="material-icons-round">check_circle</span>
+            <div class="recap-stat-info">
+                <h5>${totalHabits}</h5>
+                <p>Habits Done</p>
+            </div>
+        </div>
+    `;
+
+    highlights.innerHTML = `
+        <div class="highlight-item">🔥 ${activeDays} active days this week!</div>
+        <div class="highlight-item">✨ Average steps: ${Math.round(totalSteps / 7)} per day</div>
+    `;
+
+    modal.style.display = 'flex';
+    DB.set('lastWeeklyRecap', Date.now());
+}
+
+function closeWeeklyRecap() {
+    document.getElementById('weeklyRecapModal').style.display = 'none';
+}
+
+window.onload = function () { checkLogin(); };
