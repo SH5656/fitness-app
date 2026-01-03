@@ -70,10 +70,6 @@
                     <h1 id="welcomeMsg">Welcome back!</h1>
                     <div class="header-actions">
                         <div class="streak-badge">🔥 <span id="homeStreak">0</span> Day Streak</div>
-                        <button id="enableTrackingBtn" class="tracking-btn" onclick="requestTrackingPermission()"
-                            title="Toggle Auto Tracking">
-                            <span class="material-icons-round">sensors</span>
-                        </button>
                     </div>
                 </div>
 
@@ -86,13 +82,19 @@
                         </div>
                         <button class="mini-btn" onclick="quickAddWater()">+</button>
                     </div>
+                    <div class="stat-card timer" onclick="navigateTo('timer')">
+                        <span class="material-icons-round">timer</span>
+                        <div class="stat-info">
+                            <h3>Timer</h3>
+                            <p>Start</p>
+                        </div>
+                    </div>
                     <div class="stat-card steps">
                         <span class="material-icons-round">directions_walk</span>
                         <div class="stat-info">
                             <h3>Steps</h3>
                             <p id="homeSteps">0</p>
                         </div>
-                        <button class="mini-btn" onclick="quickAddSteps()">+</button>
                     </div>
                     <div class="stat-card calories">
                         <span class="material-icons-round">local_fire_department</span>
@@ -100,7 +102,6 @@
                             <h3>Calories</h3>
                             <p id="homeCalories">0 kcal</p>
                         </div>
-                        <button class="mini-btn" onclick="quickAddCalories()">+</button>
                     </div>
                     <div class="stat-card weight">
                         <span class="material-icons-round">monitor_weight</span>
@@ -109,6 +110,14 @@
                             <p id="homeWeight">0kg</p>
                         </div>
                         <button class="mini-btn" onclick="navigateTo('profile')">✎</button>
+                    </div>
+                    <div class="stat-card sleep">
+                        <span class="material-icons-round">bedtime</span>
+                        <div class="stat-info">
+                            <h3>Sleep</h3>
+                            <p id="homeSleep">0h</p>
+                        </div>
+                        <button class="mini-btn" onclick="quickEditSleep()">✎</button>
                     </div>
                 </div>
 
@@ -131,6 +140,14 @@
                         <!-- Injected via JS -->
                     </div>
                 </div>
+
+                <!-- Daily Summary & Insights -->
+                <div class="card summary-insights-card">
+                    <h2>✨ Daily Summary</h2>
+                    <div id="dailySummaryList" class="summary-grid-v2">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
             </section>
 
             <!-- === HABITS VIEW === -->
@@ -138,12 +155,16 @@
                 <h2>Habit Tracker</h2>
 
                 <div class="week-controls">
-                    <button class="icon-btn" onclick="changeWeek(-1)">navigate_before</button>
+                    <button class="icon-btn" onclick="changeWeek(-1)">
+                        <span class="material-icons-round">chevron_left</span>
+                    </button>
                     <div class="week-label">
                         <h3 id="monthYear"></h3>
                         <span id="weekTitle" class="subtitle"></span>
                     </div>
-                    <button class="icon-btn" onclick="changeWeek(1)">navigate_next</button>
+                    <button class="icon-btn" onclick="changeWeek(1)">
+                        <span class="material-icons-round">chevron_right</span>
+                    </button>
                 </div>
 
                 <div class="table-container">
@@ -235,9 +256,12 @@
                     <h3 id="songName" class="scrolling-text">Select a Song</h3>
 
                     <div class="music-controls-lg">
-                        <button class="ctrl-btn" onclick="prevSong()">skip_previous</button>
-                        <button class="ctrl-btn main-play" onclick="toggleMusic()">play_circle</button>
-                        <button class="ctrl-btn" onclick="nextSong()">skip_next</button>
+                        <button class="ctrl-btn" onclick="prevSong()"><span
+                                class="material-icons-round">skip_previous</span></button>
+                        <button class="ctrl-btn main-play" onclick="toggleMusic()"><span
+                                class="material-icons-round">play_circle</span></button>
+                        <button class="ctrl-btn" onclick="nextSong()"><span
+                                class="material-icons-round">skip_next</span></button>
                     </div>
 
                     <div class="volume-slider">
@@ -307,6 +331,10 @@
                         <label>⏰ Daily Alarm</label>
                         <input type="time" id="alarmTime">
                     </div>
+                    <div class="setting-item">
+                        <label>📝 Number of Habits</label>
+                        <input type="number" id="habitCountInput" min="1" max="20" placeholder="8">
+                    </div>
                 </div>
 
                 <button class="save-btn" onclick="saveProfileData()">Save Changes</button>
@@ -365,6 +393,27 @@
                 </div>
             </div>
 
+            <!-- WEEKLY RECAP MODAL -->
+            <div id="weeklyRecapModal" class="modal">
+                <div class="modal-content recap-modal">
+                    <div class="recap-header">
+                        <span class="recap-icon">📊</span>
+                        <h3>Weekly Recap</h3>
+                        <p id="recapDateRange"></p>
+                    </div>
+
+                    <div class="recap-stats-grid" id="recapStatsList">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <div class="recap-achievements">
+                        <h4>Highlights</h4>
+                        <div id="recapHighlights" class="recap-highlight-list"></div>
+                    </div>
+
+                    <button class="close-modal-btn success" onclick="closeWeeklyRecap()">Awesome! 🚀</button>
+                </div>
+            </div>
         </main>
 
         <!-- BOTTOM NAVIGATION -->
@@ -378,11 +427,14 @@
                 <span>Habits</span>
             </button>
             <button class="nav-item fab-holder" onclick="navigateTo('analytics')" data-target="analytics">
-                <div class="fab"><span class="material-icons-round">analytics</span></div>
+                <div class="fab">
+                    <span class="material-icons-round">analytics</span>
+                </div>
+                <span>Analytics</span>
             </button>
-            <button class="nav-item" onclick="navigateTo('timer')" data-target="timer">
-                <span class="material-icons-round">timer</span>
-                <span>Timer</span>
+            <button class="nav-item" onclick="navigateTo('music')" data-target="music">
+                <span class="material-icons-round">music_note</span>
+                <span>Music</span>
             </button>
             <button class="nav-item" onclick="navigateTo('profile')" data-target="profile">
                 <span class="material-icons-round">person</span>
